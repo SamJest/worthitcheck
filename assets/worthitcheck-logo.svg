@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 128" role="img" aria-labelledby="title">
+  <title>WorthItCheck</title>
+  <defs>
+    <linearGradient id="coin" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff2a8"/>
+      <stop offset="38%" stop-color="#ffd451"/>
+      <stop offset="72%" stop-color="#f3a300"/>
+      <stop offset="100%" stop-color="#a85b00"/>
+    </linearGradient>
+    <linearGradient id="wordmark" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fff2a8"/>
+      <stop offset="30%" stop-color="#ffd451"/>
+      <stop offset="75%" stop-color="#f1ad13"/>
+      <stop offset="100%" stop-color="#ffdf71"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(8 10)">
+    <circle cx="54" cy="54" r="45" fill="url(#coin)" stroke="#ffcf49" stroke-width="2"/>
+    <path d="M23 51 38 66 65 35" fill="none" stroke="#07101d" stroke-linecap="round" stroke-linejoin="round" stroke-width="9"/>
+    <path d="M70 47 87 64M87 47 70 64" fill="none" stroke="#07101d" stroke-linecap="round" stroke-width="7"/>
+    <path d="M22 94 78 16" fill="none" stroke="#07101d" stroke-linecap="round" stroke-width="10"/>
+  </g>
+  <text x="122" y="82" fill="url(#wordmark)" font-family="'Space Grotesk', 'Segoe UI', sans-serif" font-size="72" font-weight="700" letter-spacing="-3">WorthItCheck</text>
+</svg>

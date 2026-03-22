@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title>WorthItCheck Icon</title>
+  <defs>
+    <linearGradient id="coin" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff2a8"/>
+      <stop offset="38%" stop-color="#ffd451"/>
+      <stop offset="72%" stop-color="#f3a300"/>
+      <stop offset="100%" stop-color="#a85b00"/>
+    </linearGradient>
+  </defs>
+  <circle cx="64" cy="64" r="47" fill="url(#coin)" stroke="#ffcf49" stroke-width="2"/>
+  <path d="M30 62 46 77 74 45" fill="none" stroke="#07101d" stroke-linecap="round" stroke-linejoin="round" stroke-width="10"/>
+  <path d="M80 58 98 76M98 58 80 76" fill="none" stroke="#07101d" stroke-linecap="round" stroke-width="8"/>
+  <path d="M28 104 86 22" fill="none" stroke="#07101d" stroke-linecap="round" stroke-width="11"/>
+</svg>

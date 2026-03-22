@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WorthItCheck | Repair or Replace? Get a Clear Answer in Seconds</title>
+  <meta
+    name="description"
+    content="WorthItCheck helps you decide whether to repair or replace appliances, phones, laptops, cars, and more using repair cost, age, condition, and long-term value."
+  >
+  <meta name="theme-color" content="#0f172a">
+  <meta property="og:title" content="WorthItCheck | Repair or Replace?">
+  <meta property="og:description" content="Repair or replace? Get a clear answer in seconds with a smart, mobile-first decision tool.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://worthitcheck.com/og-image.jpg">
+  <link rel="icon" type="image/svg+xml" href="assets/worthitcheck-icon.svg">
+  <link rel="apple-touch-icon" href="assets/worthitcheck-icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "WorthItCheck",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "description": "A static decision tool that helps users decide whether to repair or replace an item using cost, age, condition, and long-term value signals.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is it worth repairing an old appliance?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It depends on repair cost, age, condition, and how close the appliance is to the end of its typical lifespan. Older appliances with expensive repairs often lean toward replacement."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Should I repair or replace my phone?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Phones are often worth repairing when they are relatively new and the repair cost is modest compared with buying a similar replacement. Older phones with battery, screen, or performance issues often lean toward replacement."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "When should I replace instead of repair?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Replacement becomes stronger when repair cost is a large share of replacement cost, the item is near the end of its expected lifespan, or its current condition is poor."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How accurate is this tool?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "WorthItCheck gives a practical decision based on the most important signals people use in real life: repair cost, expected lifespan, age, condition, and personal weighting such as sentimental or environmental value."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does age matter more than repair cost?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Neither factor should be judged alone. A repair can still make sense on an older item if the cost is low and condition is strong, while a younger item can still be a poor repair candidate if the repair is unusually expensive."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can sentimental value change the result?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Sentimental or environmental importance can reasonably push a borderline case toward repair, especially when the repair cost is still within a sensible range."
+          }
+        }
+      ]
+    }
+  </script>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <div class="brand-lockup">
+        <img class="brand-logo" src="assets/worthitcheck-logo.svg" alt="WorthItCheck">
+      </div>
+      <a class="header-link" href="#examples">Real examples</a>
+    </header>
+
+    <main>
+      <section class="hero section">
+        <div class="hero-copy">
+          <p class="eyebrow">Repair or Replace</p>
+          <h1>Repair or replace? Get a clear answer in seconds.</h1>
+          <p class="hero-subheading">
+            WorthItCheck weighs repair cost, expected lifespan, condition, and long-term value to deliver a verdict that feels more like informed judgment than a basic calculator.
+          </p>
+          <div class="trust-strip" aria-label="Decision signals used">
+            <span>Cost reality</span>
+            <span>Lifespan context</span>
+            <span>Condition signal</span>
+            <span>Value weighting</span>
+          </div>
+        </div>
+
+        <section class="tool-card" aria-labelledby="tool-title">
+          <div class="tool-card__header">
+            <p class="tool-chip">Primary tool</p>
+            <h2 id="tool-title">Repair or Replace</h2>
+            <p>Enter a few details and get a confident recommendation with reasoning.</p>
+          </div>
+
+          <form id="decision-form" class="decision-form" novalidate>
+            <div class="field-grid">
+              <label class="field">
+                <span>Item category</span>
+                <select id="category" name="category" required>
+                  <option value="">Choose a category</option>
+                </select>
+              </label>
+
+              <label class="field">
+                <span>Age</span>
+                <div class="input-with-suffix">
+                  <input id="age" name="age" type="number" min="0" max="50" step="0.5" placeholder="e.g. 4" required>
+                  <span>years</span>
+                </div>
+              </label>
+
+              <label class="field">
+                <span>Repair cost</span>
+                <div class="input-with-prefix">
+                  <span>$</span>
+                  <input id="repair-cost" name="repairCost" type="number" min="1" step="1" placeholder="e.g. 180" required>
+                </div>
+              </label>
+
+              <label class="field">
+                <span>Replacement cost</span>
+                <div class="input-with-prefix">
+                  <span>$</span>
+                  <input id="replacement-cost" name="replacementCost" type="number" min="1" step="1" placeholder="e.g. 550" required>
+                </div>
+              </label>
+
+              <label class="field">
+                <span>Current condition</span>
+                <select id="condition" name="condition" required>
+                  <option value="excellent">Excellent</option>
+                  <option value="good" selected>Good</option>
+                  <option value="fair">Fair</option>
+                  <option value="poor">Poor</option>
+                </select>
+              </label>
+
+              <fieldset class="field field--range">
+                <legend>Sentimental or environmental importance</legend>
+                <input id="importance" name="importance" type="range" min="0" max="10" step="1" value="4" aria-describedby="importance-value">
+                <div class="range-footer">
+                  <span>Low</span>
+                  <output id="importance-value" for="importance">4/10</output>
+                  <span>High</span>
+                </div>
+              </fieldset>
+            </div>
+
+            <div id="form-message" class="form-message" role="status" aria-live="polite"></div>
+
+            <button id="analyze-button" class="analyze-button" type="submit">
+              <span class="button-label">Analyze</span>
+              <span class="button-pulse" aria-hidden="true"></span>
+            </button>
+          </form>
+        </section>
+      </section>
+
+      <section id="results" class="results section" aria-live="polite" hidden>
+        <div class="results-shell">
+          <div class="thinking-panel" id="thinking-panel" hidden>
+            <div class="thinking-orb" aria-hidden="true"></div>
+            <p class="thinking-label">WorthItCheck is reviewing the signals</p>
+            <p id="thinking-text" class="thinking-text">Analyzing repair vs replacement cost...</p>
+          </div>
+
+          <article id="result-card" class="result-card" hidden>
+            <div class="result-card__topline">
+              <span class="result-label">Decision verdict</span>
+              <span id="confidence-pill" class="confidence-pill"></span>
+            </div>
+
+            <div class="verdict-row">
+              <h2 id="verdict" class="verdict">Replace</h2>
+              <p id="summary" class="summary"></p>
+            </div>
+
+            <div class="metrics-row" id="metrics-row"></div>
+
+            <section class="key-factors" aria-labelledby="key-factors-title">
+              <div class="section-heading">
+                <h3 id="key-factors-title">Key factors</h3>
+                <p>The strongest signals behind the recommendation.</p>
+              </div>
+              <div id="factor-list" class="factor-list"></div>
+            </section>
+
+            <details class="reasoning-details">
+              <summary>See full reasoning</summary>
+              <div id="full-reasoning" class="reasoning-copy"></div>
+            </details>
+          </article>
+        </div>
+      </section>
+
+      <section class="how-it-works section" id="how-it-works">
+        <div class="section-heading">
+          <p class="eyebrow">How it works</p>
+          <h2>Practical signals, not guesswork</h2>
+        </div>
+        <div class="how-grid">
+          <article class="info-card">
+            <h3>Cost pressure</h3>
+            <p>We look at how large the repair bill is compared with buying a reasonable replacement, because cost alone can quickly make a repair less attractive.</p>
+          </article>
+          <article class="info-card">
+            <h3>Lifespan context</h3>
+            <p>Age matters more when it is anchored to the type of item. A 4-year-old phone and a 4-year-old refrigerator are in very different stages of life.</p>
+          </article>
+          <article class="info-card">
+            <h3>Condition signal</h3>
+            <p>Current condition helps separate a one-off repair from a sign that more failures may be waiting around the corner.</p>
+          </article>
+          <article class="info-card">
+            <h3>Long-term value</h3>
+            <p>Personal importance still counts. Sentimental attachment or a desire to avoid waste can shift close calls toward repair when the numbers still make sense.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="examples" class="examples section" aria-labelledby="examples-title">
+        <div class="section-heading">
+          <p class="eyebrow">Real example scenarios</p>
+          <h2 id="examples-title">Thirty repair vs replace examples across everyday decisions</h2>
+          <p>Browse realistic cases across phones, laptops, appliances, cars, and home items to see how repair cost, age, and condition change the answer.</p>
+        </div>
+        <div class="examples-groups">
+          <section class="example-group" aria-labelledby="group-phones">
+            <div class="example-group__header">
+              <h3 id="group-phones">Phones</h3>
+              <p>Fast-moving devices where age, battery health, and repair pricing matter a lot.</p>
+            </div>
+            <div class="examples-grid">
+              <article class="example-card">
+                <div class="example-body">
+                  <h4>iPhone 14 with cracked screen</h4>
+                  <div class="example-meta">
+                    <span>1.5 years old</span>
+                    <span>$279 repair</span>
+                    <span>$799 replace</span>
+                  </div>
+                  <div class="example-result">Repair</div>
+                  <p>The repair is only 35% of replacement cost, and the phone is still relatively new. Repair is the stronger choice.</p>
+                </div>
+              </article>
+              <article class="example-card">
+                <div class="example-body">
+                  <h4>3-year-old Galaxy phone with battery issue</h4>
+                  <div class="example-meta">
+                    <span>3 years old</span>
+                    <span>$129 repair</span>
+                    <span>$699 replace</span>
+                  </div>
+                  <div class="example-result">Repair</div>
+                  <p>At under 20% of replacement cost, a battery replacement is still easy to justify if the rest of the phone performs well.</p>
+                </div>
+              </article>
+              <article class="example-card">
+                <div class="example-body">
+                  <h4>4.5-year-old iPhone with battery and lag problems</h4>
+                  <div class="example-meta">
+                    <span>4.5 years old</span>
+                    <span>$240 repair</span>
+                    <span>$850 replace</span>
+                  </div>
+                  <div class="example-result">Replace</div>
+                  <p>The repair cost is manageable, but the phone is already near the end of its typical lifespan. Replacement is the stronger long-term move.</p>
+                </div>
+              </article>
+              <article class="example-card">
+                <div class="example-body">
+                  <h4>Budget Android with broken charging port</h4>
+                  <div class="example-meta">
+                    <span>2 years old</span>
+                    <span>$120 repair</span>
+                    <span>$220 replace</span>
+                  </div>
+                  <div class="example-result">Replace</div>
+                  <p>Replacement cost is already low, so a repair over half of replacement cost pushes this toward replacement.</p>
+                </div>
+              </article>
+              <article class="example-card">
+                <div class="example-body">
+                  <h4>Premium foldable phone with hinge issue</h4>
+                  <div class="example-meta">
+                    <span>2 years old</span>
+                    <span>$480 repair</span>
+                    <span>$1,499 replace</span>
+                  </div>
+                  <div class="example-result">Repair</div>
+                  <p>The repair is expensive in absolute terms, but still far below replacement cost and the device is not yet old.</p>
+                </div>
+              </article>
+              <article class="example-card">
+                <div class="example-body">
+                  <h4>5-year-old phone with cracked screen and poor battery</h4>
+                  <div class="example-meta">
+                    <span>5 years old</span>
+                    <span>$210 repair</span>
+                    <span>$650 replace</span>
+                  </div>
+                  <div class="example-result">Replace</div>
+                  <p>At this age, stacking issues are a warning sign. Repair is possible, but replacement is easier to defend.</p>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="example-group" aria-labelledby="group-laptops">
+            <div class="example-group__header">
+              <h3 id="group-laptops">Laptops &amp; Electronics</h3>
+              <p>Useful for comparing targeted repairs against broader age and performance decline.</p>
+            </div>
+            <div class="examples-grid">
+              <article class="example-card">
+                <div class="example-body">
+                  <h4>3-year-old MacBook with battery replacement</h4>
+                  <div class="example-meta">
+                    <span>3 years old</span>
+                    <span>$249 repair</span>
+                    <span>$1,399 replace</span>
+                  </div>
+                  <div class="example-result">Repair</div>
+                  <p>The repair cost is modest relative to replacement, and the laptop likely still has years of useful life left.</p>
+                </div>
+              </article>
+              <article class="example-card">
+                <div class="example-body">
+                  <h4>Gaming laptop with failed SSD</h4>
+                  <div class="example-meta">
+                    <span>2.5 years old</span>
+                    <span>$180 repair</span>
+                    <span>$1,200 replace</span>
+                  </div>
+                  <div class="example-result">Repair</div>
+                  <p>This is a relatively focused repair on a still-current machine, so repair is the stronger call.</p>
+                </div>
+              </article>
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>7-year-old laptop with motherboard issue</h4>
+                  <div class="example-meta">
+                    <span>7 years old</span>
+                    <span>$600 repair</span>
+                    <span>$1,050 replace</span>
+                  </div>
+                  <div class="example-result">Replace</div>
+                  <p>You would be putting serious money into an aging device already near the end of its normal run.</p>
+                </div>
+              </article>
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>55-inch TV with backlight repair</h4>
+                  <div class="example-meta">
+                    <span>6 years old</span>
+                    <span>$280 repair</span>
+                    <span>$520 replace</span>
+                  </div>
+                  <div class="example-result">Borderline</div>
+                  <p>The numbers are not outrageous, but TV replacement pricing is competitive enough that either choice can make sense.</p>
+                </div>
+              </article>
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>4-year-old iPad with shattered display</h4>
+                  <div class="example-meta">
+                    <span>4 years old</span>
+                    <span>$320 repair</span>
+                    <span>$599 replace</span>
+                  </div>
+                  <div class="example-result">Borderline</div>
+                  <p>The repair is over half the cost of replacement, but the device may still be useful enough to justify a fix if performance is strong.</p>
+                </div>
+              </article>
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>Noise-cancelling headphones with broken hinge</h4>
+                  <div class="example-meta">
+                    <span>2 years old</span>
+                    <span>$85 repair</span>
+                    <span>$280 replace</span>
+                  </div>
+                  <div class="example-result">Repair</div>
+                  <p>The repair is still a manageable share of replacement cost, and the item is not especially old.</p>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="example-group" aria-labelledby="group-appliances">
+            <div class="example-group__header">
+              <h3 id="group-appliances">Appliances</h3>
+              <p>Big-ticket home items where lifespan context matters as much as the invoice.</p>
+            </div>
+            <div class="examples-grid">
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>5-year-old refrigerator not cooling properly</h4>
+                  <div class="example-meta">
+                    <span>5 years old</span>
+                    <span>$240 repair</span>
+                    <span>$1,400 replace</span>
+                  </div>
+                  <div class="example-result">Repair</div>
+                  <p>The repair is only 17% of replacement cost, and the refrigerator should still have meaningful life left.</p>
+                </div>
+              </article>
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>9-year-old dishwasher leaking</h4>
+                  <div class="example-meta">
+                    <span>9 years old</span>
+                    <span>$380 repair</span>
+                    <span>$650 replace</span>
+                  </div>
+                  <div class="example-result">Replace</div>
+                  <p>The repair cost is already high relative to replacement, and the dishwasher is nearing the end of its normal lifespan.</p>
+                </div>
+              </article>
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>2-year-old washing machine with drain pump issue</h4>
+                  <div class="example-meta">
+                    <span>2 years old</span>
+                    <span>$160 repair</span>
+                    <span>$780 replace</span>
+                  </div>
+                  <div class="example-result">Repair</div>
+                  <p>This is still a young appliance, and the repair sits in a comfortable range compared with replacement.</p>
+                </div>
+              </article>
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>11-year-old dryer with heating failure</h4>
+                  <div class="example-meta">
+                    <span>11 years old</span>
+                    <span>$290 repair</span>
+                    <span>$700 replace</span>
+                  </div>
+                  <div class="example-result">Borderline</div>
+                  <p>The repair is not unreasonable, but age makes the decision much tighter than the numbers alone suggest.</p>
+                </div>
+              </article>
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>4-year-old oven with control board failure</h4>
+                  <div class="example-meta">
+                    <span>4 years old</span>
+                    <span>$310 repair</span>
+                    <span>$1,050 replace</span>
+                  </div>
+                  <div class="example-result">Repair</div>
+                  <p>Repair is still well below replacement cost, and the appliance is not close to end-of-life.</p>
+                </div>
+              </article>
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>8-year-old microwave with repeated faults</h4>
+                  <div class="example-meta">
+                    <span>8 years old</span>
+                    <span>$140 repair</span>
+                    <span>$220 replace</span>
+                  </div>
+                  <div class="example-result">Replace</div>
+                  <p>Cheap replacement pricing and repeated issues make repair hard to justify here.</p>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="example-group" aria-labelledby="group-cars">
+            <div class="example-group__header">
+              <h3 id="group-cars">Cars</h3>
+              <p>Higher repair bills can still make sense, but age and condition create bigger swings.</p>
+            </div>
+            <div class="examples-grid">
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>6-year-old sedan needing brakes and tires</h4>
+                  <div class="example-meta">
+                    <span>6 years old</span>
+                    <span>$1,400 repair</span>
+                    <span>$19,000 replace</span>
+                  </div>
+                  <div class="example-result">Repair</div>
+                  <p>The repair cost is small relative to replacement, and the car is still in a reasonable life stage.</p>
+                </div>
+              </article>
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>13-year-old car with transmission issue</h4>
+                  <div class="example-meta">
+                    <span>13 years old</span>
+                    <span>$4,200 repair</span>
+                    <span>$13,500 replace</span>
+                  </div>
+                  <div class="example-result">Replace</div>
+                  <p>The car is already late in its lifespan, so a major repair becomes much riskier as a long-term bet.</p>
+                </div>
+              </article>
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>9-year-old SUV needing air conditioning compressor</h4>
+                  <div class="example-meta">
+                    <span>9 years old</span>
+                    <span>$1,050 repair</span>
+                    <span>$16,500 replace</span>
+                  </div>
+                  <div class="example-result">Repair</div>
+                  <p>This is still a relatively contained repair cost compared with replacement, especially if the car is otherwise sound.</p>
+                </div>
+              </article>
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>11-year-old hatchback with engine trouble</h4>
+                  <div class="example-meta">
+                    <span>11 years old</span>
+                    <span>$3,600 repair</span>
+                    <span>$8,500 replace</span>
+                  </div>
+                  <div class="example-result">Replace</div>
+                  <p>The repair cost is substantial, and engine work on an older car often carries too much follow-on risk.</p>
+                </div>
+              </article>
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>4-year-old electric scooter with battery pack replacement</h4>
+                  <div class="example-meta">
+                    <span>4 years old</span>
+                    <span>$350 repair</span>
+                    <span>$850 replace</span>
+                  </div>
+                  <div class="example-result">Borderline</div>
+                  <p>The repair cost is meaningful, but replacing a still-usable mobility item can also feel premature.</p>
+                </div>
+              </article>
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>8-year-old hybrid with inverter repair</h4>
+                  <div class="example-meta">
+                    <span>8 years old</span>
+                    <span>$1,800 repair</span>
+                    <span>$17,000 replace</span>
+                  </div>
+                  <div class="example-result">Repair</div>
+                  <p>The bill is high, but still modest relative to replacement and reasonable for a car in mid-life.</p>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="example-group" aria-labelledby="group-home">
+            <div class="example-group__header">
+              <h3 id="group-home">Home &amp; Lifestyle</h3>
+              <p>Mixed-price items where quality and sentimental value can legitimately affect the call.</p>
+            </div>
+            <div class="examples-grid">
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>Solid wood dining table with damaged leg</h4>
+                  <div class="example-meta">
+                    <span>11 years old</span>
+                    <span>$280 repair</span>
+                    <span>$950 replace</span>
+                  </div>
+                  <div class="example-result">Repair</div>
+                  <p>Furniture can justify repair well when the replacement cost is high enough and the piece still has value or character.</p>
+                </div>
+              </article>
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>Robot vacuum with failing battery and brush motor</h4>
+                  <div class="example-meta">
+                    <span>4 years old</span>
+                    <span>$190 repair</span>
+                    <span>$450 replace</span>
+                  </div>
+                  <div class="example-result">Borderline</div>
+                  <p>The repair cost is climbing into uncomfortable territory, but replacement is not dramatically better either.</p>
+                </div>
+              </article>
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>E-bike with controller issue</h4>
+                  <div class="example-meta">
+                    <span>3 years old</span>
+                    <span>$220 repair</span>
+                    <span>$1,500 replace</span>
+                  </div>
+                  <div class="example-result">Repair</div>
+                  <p>The repair is a small share of replacement cost and the bike should still have useful service ahead.</p>
+                </div>
+              </article>
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>Coffee machine with pump failure</h4>
+                  <div class="example-meta">
+                    <span>6 years old</span>
+                    <span>$180 repair</span>
+                    <span>$260 replace</span>
+                  </div>
+                  <div class="example-result">Replace</div>
+                  <p>Once the repair cost gets close to replacement on a modestly priced item, replacement usually becomes the cleaner choice.</p>
+                </div>
+              </article>
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>Patio heater with ignition problem</h4>
+                  <div class="example-meta">
+                    <span>5 years old</span>
+                    <span>$95 repair</span>
+                    <span>$260 replace</span>
+                  </div>
+                  <div class="example-result">Repair</div>
+                  <p>This is still a manageable repair relative to replacement, especially if the unit is otherwise in good condition.</p>
+                </div>
+              </article>
+              <article class="example-card extra-example">
+                <div class="example-body">
+                  <h4>Designer floor lamp with sentimental value</h4>
+                  <div class="example-meta">
+                    <span>9 years old</span>
+                    <span>$140 repair</span>
+                    <span>$380 replace</span>
+                  </div>
+                  <div class="example-result">Repair</div>
+                  <p>The numbers are reasonable already, and sentimental value makes repair an even easier decision.</p>
+                </div>
+              </article>
+            </div>
+          </section>
+        </div>
+        <button id="examples-toggle" class="examples-toggle" type="button" aria-expanded="false" hidden>Show more examples</button>
+      </section>
+
+      <section class="faq section" aria-labelledby="faq-title">
+        <div class="section-heading">
+          <p class="eyebrow">FAQ</p>
+          <h2 id="faq-title">Common repair or replace questions</h2>
+        </div>
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>Is it worth repairing an old appliance?</summary>
+            <p>Sometimes, but not automatically. If an appliance is already near the end of its usual lifespan and the repair bill is a large share of replacement cost, replacement is often the stronger long-term move.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Should I repair or replace my phone?</summary>
+            <p>A newer phone with a manageable screen or battery repair often deserves repair. An older phone with slowing performance, battery wear, and a costly fix often leans toward replacement.</p>
+          </details>
+          <details class="faq-item">
+            <summary>When should I replace instead of repair?</summary>
+            <p>Replacement becomes more compelling when the repair cost climbs, the item is aging out of its expected lifespan, or overall condition suggests more trouble ahead.</p>
+          </details>
+          <details class="faq-item">
+            <summary>How accurate is this tool?</summary>
+            <p>This tool is designed to give a realistic first decision, not a perfect prediction. It mirrors the strongest signals people use in real repair-versus-replace choices and turns them into a clear recommendation.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Does age matter more than repair cost?</summary>
+            <p>Usually they matter together. A low repair cost can justify fixing an older item, while a very expensive repair can make replacement sensible even for something fairly new.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Can sentimental value change the result?</summary>
+            <p>Yes. If the case is close, sentimental or environmental importance can tip the recommendation toward repair, especially when the item still has useful life left.</p>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div>
+        <p class="brand-name">WorthItCheck</p>
+        <p class="footer-copy">Clear repair-versus-replace decisions for real-world purchases and repairs.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer">
+        <a href="#tool-title">Repair or Replace</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#examples">Examples</a>
+        <span class="footer-muted">More tools coming soon</span>
+      </nav>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
