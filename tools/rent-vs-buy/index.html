@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rent vs Buy | Is It Better to Rent or Buy?</title>
+  <meta name="description" content="Use WorthItCheck Rent vs Buy to compare simple renting vs ownership cost and decide whether you should rent or buy.">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="icon" type="image/svg+xml" href="../../assets/worthitcheck-icon.svg">
+  <link rel="apple-touch-icon" href="../../assets/worthitcheck-icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <a class="brand-lockup" href="../../">
+        <img class="brand-logo" src="../../assets/worthitcheck-logo.svg" alt="WorthItCheck">
+      </a>
+      <a class="header-link" href="../">All tools</a>
+    </header>
+
+    <main>
+      <section class="hero section">
+        <div class="hero-copy">
+          <p class="eyebrow">Tool 4</p>
+          <h1>Rent vs buy?</h1>
+          <p class="hero-subheading">WorthItCheck compares simple renting vs owning cost over your timeline so you can see whether buying or renting looks financially stronger.</p>
+          <div class="trust-strip" aria-label="Decision signals used">
+            <span>Rent cost</span>
+            <span>Ownership cost</span>
+            <span>Time horizon</span>
+            <span>Stability</span>
+          </div>
+        </div>
+
+        <section class="tool-card" aria-labelledby="rent-buy-title">
+          <div class="tool-card__header">
+            <p class="tool-chip">Rent vs Buy</p>
+            <h2 id="rent-buy-title">Renting vs buying</h2>
+            <p>Enter a few numbers and get a simple verdict.</p>
+          </div>
+
+          <form id="rent-buy-form" class="decision-form" novalidate>
+            <div class="field-grid">
+              <label class="field">
+                <span>Monthly rent (£)</span>
+                <div class="input-with-prefix">
+                  <span>£</span>
+                  <input name="rent" type="number" min="1" step="1" placeholder="e.g. 1200" required>
+                </div>
+              </label>
+
+              <label class="field">
+                <span>Purchase price (£)</span>
+                <div class="input-with-prefix">
+                  <span>£</span>
+                  <input name="price" type="number" min="1" step="1" placeholder="e.g. 18000" required>
+                </div>
+              </label>
+
+              <label class="field">
+                <span>Monthly ownership cost (£)</span>
+                <div class="input-with-prefix">
+                  <span>£</span>
+                  <input name="ownership" type="number" min="0" step="1" placeholder="maintenance / insurance / running costs" required>
+                </div>
+              </label>
+
+              <label class="field">
+                <span>Time horizon (years)</span>
+                <div class="input-with-suffix">
+                  <input name="years" type="number" min="0.5" max="30" step="0.5" placeholder="e.g. 5" required>
+                  <span>years</span>
+                </div>
+              </label>
+
+              <fieldset class="field">
+                <legend>Usage stability</legend>
+                <div class="choice-grid">
+                  <label class="choice-option"><input type="radio" name="stability" value="short" checked><span>Short term</span></label>
+                  <label class="choice-option"><input type="radio" name="stability" value="medium"><span>Medium term</span></label>
+                  <label class="choice-option"><input type="radio" name="stability" value="long"><span>Long term</span></label>
+                </div>
+              </fieldset>
+            </div>
+
+            <div id="rent-buy-message" class="form-message" role="status" aria-live="polite"></div>
+            <button id="rent-buy-submit" class="analyze-button" type="submit">
+              <span class="button-label">Analyse</span>
+              <span class="button-pulse" aria-hidden="true"></span>
+            </button>
+          </form>
+          <div class="ad-slot ad-below-tool">Ad space</div>
+        </section>
+      </section>
+
+      <section id="rent-buy-results" class="results section" aria-live="polite" hidden>
+        <div class="results-shell">
+          <div class="thinking-panel" id="rent-buy-thinking" hidden>
+            <div class="thinking-orb" aria-hidden="true"></div>
+            <p class="thinking-label">WorthItCheck is reviewing the cost timeline</p>
+            <p id="rent-buy-thinking-text" class="thinking-text">Calculating long-term costs...</p>
+          </div>
+
+          <article id="rent-buy-card" class="result-card" hidden>
+            <div class="result-card__topline">
+              <span class="result-label">Decision verdict</span>
+              <span id="rent-buy-confidence" class="confidence-pill"></span>
+            </div>
+            <div class="verdict-row">
+              <h2 id="rent-buy-verdict" class="verdict">RENT</h2>
+              <p id="rent-buy-summary" class="summary"></p>
+            </div>
+            <div class="metrics-row">
+              <article class="metric"><strong id="rent-total">£0</strong><span>Total rent cost</span></article>
+              <article class="metric"><strong id="buy-total">£0</strong><span>Total ownership cost</span></article>
+            </div>
+            <ul id="rent-buy-reasons" class="reason-list"></ul>
+            <details class="reasoning-details">
+              <summary>See full reasoning</summary>
+              <div id="rent-buy-explainer" class="reasoning-copy"></div>
+            </details>
+            <div class="ad-slot ad-after-result">Ad space</div>
+          </article>
+        </div>
+      </section>
+
+      <section class="how-it-works section">
+        <div class="section-heading">
+          <p class="eyebrow">How it works</p>
+          <h2>Simple long-term renting vs owning cost</h2>
+        </div>
+        <div class="how-grid">
+          <article class="info-card"><h3>Timeline first</h3><p>Short stays usually lean toward renting because the upfront cost of buying is harder to spread out.</p></article>
+          <article class="info-card"><h3>Ownership is not just price</h3><p>Maintenance, insurance, and running costs still count when you compare renting vs owning cost.</p></article>
+          <article class="info-card"><h3>Stability changes the answer</h3><p>Long-term stable use makes buying easier to justify than short-term or uncertain plans.</p></article>
+          <article class="info-card"><h3>Close calls stay close</h3><p>If both totals are similar, rent vs buy often becomes more about flexibility than pure numbers.</p></article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Renting vs buying</p>
+          <h2>Renting vs buying explained</h2>
+          <p>If you are asking is it better to rent or buy, the core question is whether ownership cost stays below renting cost over the time you expect to keep using it. Short timelines usually favour renting. Longer stable timelines can make buying much stronger.</p>
+        </div>
+      </section>
+
+      <div class="ad-slot ad-mid-content">Ad space</div>
+
+      <section class="examples section" aria-labelledby="rent-buy-examples-title">
+        <div class="section-heading">
+          <p class="eyebrow">Real-life examples</p>
+          <h2 id="rent-buy-examples-title">Ten rent vs buy examples</h2>
+          <p>These examples show how should I rent or buy decisions can change with time horizon, rent level, and ownership cost.</p>
+        </div>
+        <div class="examples-groups">
+          <section class="example-group">
+            <div class="examples-grid">
+              <article class="example-card"><div class="example-body"><h4>1-year stay</h4><div class="example-meta"><span>1 year</span><span>Short term</span><span>High upfront</span></div><div class="example-result">RENT</div><p>A one-year timeline usually does not give buying enough time to make up for the upfront cost.</p></div></article>
+              <article class="example-card"><div class="example-body"><h4>2-year stay, high upfront</h4><div class="example-meta"><span>2 years</span><span>Short term</span><span>High purchase price</span></div><div class="example-result">RENT</div><p>The short timeline still favours renting because the upfront buy cost stays hard to recover.</p></div></article>
+              <article class="example-card"><div class="example-body"><h4>5-year stay, lower ownership cost</h4><div class="example-meta"><span>5 years</span><span>Medium term</span><span>Lower monthly ownership</span></div><div class="example-result">BUY</div><p>Over a longer period, ownership can come out cheaper when ongoing costs stay controlled.</p></div></article>
+              <article class="example-card"><div class="example-body"><h4>10-year stable</h4><div class="example-meta"><span>10 years</span><span>Long term</span><span>Stable use</span></div><div class="example-result">BUY</div><p>A long stable timeline gives buying far more room to win on total cost.</p></div></article>
+              <article class="example-card"><div class="example-body"><h4>Similar costs</h4><div class="example-meta"><span>4 years</span><span>Medium term</span><span>Totals close</span></div><div class="example-result">BORDERLINE</div><p>When renting vs owning cost is very close, flexibility and personal preference matter more.</p></div></article>
+              <article class="example-card extra-example"><div class="example-body"><h4>High rent area</h4><div class="example-meta"><span>6 years</span><span>Long term</span><span>High rent</span></div><div class="example-result">BUY</div><p>High recurring rent can make ownership comparatively stronger over time.</p></div></article>
+              <article class="example-card extra-example"><div class="example-body"><h4>Low rent, high purchase price</h4><div class="example-meta"><span>5 years</span><span>Medium term</span><span>Low rent</span></div><div class="example-result">RENT</div><p>If rent is low and the purchase price is high, renting can stay cheaper for longer.</p></div></article>
+              <article class="example-card extra-example"><div class="example-body"><h4>Short-term relocation</h4><div class="example-meta"><span>1.5 years</span><span>Short term</span><span>Uncertain move</span></div><div class="example-result">RENT</div><p>Short-term relocation usually makes flexibility more valuable than ownership.</p></div></article>
+              <article class="example-card extra-example"><div class="example-body"><h4>Stable long-term family use</h4><div class="example-meta"><span>8 years</span><span>Long term</span><span>Stable plan</span></div><div class="example-result">BUY</div><p>A stable long-term plan gives buying more time to beat renting on total cost.</p></div></article>
+              <article class="example-card extra-example"><div class="example-body"><h4>Medium-term uncertain</h4><div class="example-meta"><span>3.5 years</span><span>Medium term</span><span>Uncertain stability</span></div><div class="example-result">BORDERLINE</div><p>The timeline is long enough to consider buying, but uncertainty keeps the call close.</p></div></article>
+            </div>
+          </section>
+        </div>
+        <button id="examples-toggle" class="examples-toggle" type="button" aria-expanded="false" hidden>Show more examples</button>
+      </section>
+
+      <section class="faq section" aria-labelledby="rent-buy-faq-title">
+        <div class="section-heading">
+          <p class="eyebrow">FAQ</p>
+          <h2 id="rent-buy-faq-title">Common rent vs buy questions</h2>
+        </div>
+        <div class="faq-list">
+          <details class="faq-item"><summary>Is it better to rent or buy for a short time?</summary><p>Usually rent, because the shorter the timeline, the harder it is for buying to overcome the upfront cost.</p></details>
+          <details class="faq-item"><summary>What matters most in renting vs owning cost?</summary><p>The main drivers are monthly rent, purchase price, ongoing ownership costs, and how many years you expect to keep it.</p></details>
+          <details class="faq-item"><summary>When does buying usually win?</summary><p>Buying tends to win when ownership cost stays below rent over a longer stable time horizon.</p></details>
+          <details class="faq-item"><summary>Why can rent vs buy become borderline?</summary><p>If the totals are close, flexibility and uncertainty can matter almost as much as the raw numbers.</p></details>
+          <details class="faq-item"><summary>Does stability matter?</summary><p>Yes. Long-term stability makes buying easier to justify, while short-term plans usually support renting.</p></details>
+          <details class="faq-item"><summary>Should I rent or buy if I am unsure?</summary><p>If your timeline is uncertain and the numbers are close, borderline or rent is often the safer answer.</p></details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div>
+        <p class="brand-name">WorthItCheck</p>
+        <p class="footer-copy">Clear decision tools for real-world buying and repair calls.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer">
+        <a href="../../">Home</a>
+        <a href="../">All tools</a>
+        <a href="../buy-or-wait/">Buy or Wait</a>
+        <a href="../should-i-upgrade/">Should I Upgrade?</a>
+      </nav>
+    </footer>
+  </div>
+
+  <script src="tool.js"></script>
+</body>
+</html>
