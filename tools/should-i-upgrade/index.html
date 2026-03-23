@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Should I Upgrade? | Upgrade or Keep Device</title>
+  <meta name="description" content="Use WorthItCheck Should I Upgrade to decide whether to upgrade or keep your phone, laptop, tablet, TV, or other device.">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="icon" type="image/svg+xml" href="../../assets/worthitcheck-icon.svg">
+  <link rel="apple-touch-icon" href="../../assets/worthitcheck-icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <a class="brand-lockup" href="../../">
+        <img class="brand-logo" src="../../assets/worthitcheck-logo.svg" alt="WorthItCheck">
+      </a>
+      <a class="header-link" href="../">All tools</a>
+    </header>
+
+    <main>
+      <section class="hero section">
+        <div class="hero-copy">
+          <p class="eyebrow">Tool 3</p>
+          <h1>Should I upgrade?</h1>
+          <p class="hero-subheading">WorthItCheck weighs age, speed, battery health, feature pull, and daily usage to decide whether you should upgrade or keep your device.</p>
+          <div class="trust-strip" aria-label="Decision signals used">
+            <span>Performance</span>
+            <span>Battery health</span>
+            <span>Age pressure</span>
+            <span>Usage load</span>
+          </div>
+        </div>
+
+        <section class="tool-card" aria-labelledby="upgrade-title">
+          <div class="tool-card__header">
+            <p class="tool-chip">Should I Upgrade?</p>
+            <h2 id="upgrade-title">Upgrade or keep</h2>
+            <p>Answer a few quick questions and get a clear recommendation.</p>
+          </div>
+
+          <form id="upgrade-form" class="decision-form" novalidate>
+            <div class="field-grid">
+              <label class="field">
+                <span>Device type</span>
+                <select name="device" required>
+                  <option value="">Choose a device</option>
+                  <option value="phone">Phone</option>
+                  <option value="laptop">Laptop</option>
+                  <option value="tablet">Tablet</option>
+                  <option value="tv">TV</option>
+                  <option value="other">Other</option>
+                </select>
+              </label>
+
+              <label class="field">
+                <span>Age</span>
+                <div class="input-with-suffix">
+                  <input name="age" type="number" min="0" max="15" step="0.5" placeholder="e.g. 3" required>
+                  <span>years</span>
+                </div>
+              </label>
+
+              <fieldset class="field">
+                <legend>Performance</legend>
+                <div class="choice-grid">
+                  <label class="choice-option"><input type="radio" name="performance" value="fast" checked><span>Fast</span></label>
+                  <label class="choice-option"><input type="radio" name="performance" value="slowing"><span>Slowing</span></label>
+                  <label class="choice-option"><input type="radio" name="performance" value="very-slow"><span>Very slow</span></label>
+                </div>
+              </fieldset>
+
+              <fieldset class="field">
+                <legend>Battery / reliability</legend>
+                <div class="choice-grid">
+                  <label class="choice-option"><input type="radio" name="battery" value="good" checked><span>Good</span></label>
+                  <label class="choice-option"><input type="radio" name="battery" value="degrading"><span>Degrading</span></label>
+                  <label class="choice-option"><input type="radio" name="battery" value="poor"><span>Poor</span></label>
+                </div>
+              </fieldset>
+
+              <fieldset class="field">
+                <legend>New features importance</legend>
+                <div class="choice-grid">
+                  <label class="choice-option"><input type="radio" name="features" value="low" checked><span>Low</span></label>
+                  <label class="choice-option"><input type="radio" name="features" value="medium"><span>Medium</span></label>
+                  <label class="choice-option"><input type="radio" name="features" value="high"><span>High</span></label>
+                </div>
+              </fieldset>
+
+              <fieldset class="field">
+                <legend>Usage intensity</legend>
+                <div class="choice-grid">
+                  <label class="choice-option"><input type="radio" name="usage" value="light" checked><span>Light</span></label>
+                  <label class="choice-option"><input type="radio" name="usage" value="moderate"><span>Moderate</span></label>
+                  <label class="choice-option"><input type="radio" name="usage" value="heavy"><span>Heavy</span></label>
+                </div>
+              </fieldset>
+            </div>
+
+            <div id="upgrade-message" class="form-message" role="status" aria-live="polite"></div>
+            <button id="upgrade-submit" class="analyze-button" type="submit">
+              <span class="button-label">Analyse</span>
+              <span class="button-pulse" aria-hidden="true"></span>
+            </button>
+          </form>
+          <div class="ad-slot ad-below-tool">Ad space</div>
+        </section>
+      </section>
+
+      <section id="upgrade-results" class="results section" aria-live="polite" hidden>
+        <div class="results-shell">
+          <div class="thinking-panel" id="upgrade-thinking" hidden>
+            <div class="thinking-orb" aria-hidden="true"></div>
+            <p class="thinking-label">WorthItCheck is reviewing the upgrade signals</p>
+            <p id="upgrade-thinking-text" class="thinking-text">Checking performance signals...</p>
+          </div>
+
+          <article id="upgrade-card" class="result-card" hidden>
+            <div class="result-card__topline">
+              <span class="result-label">Decision verdict</span>
+              <span id="upgrade-confidence" class="confidence-pill"></span>
+            </div>
+            <div class="verdict-row">
+              <h2 id="upgrade-verdict" class="verdict">KEEP</h2>
+              <p id="upgrade-summary" class="summary"></p>
+            </div>
+            <ul id="upgrade-reasons" class="reason-list"></ul>
+            <details class="reasoning-details">
+              <summary>See full reasoning</summary>
+              <div id="upgrade-explainer" class="reasoning-copy"></div>
+            </details>
+            <div class="ad-slot ad-after-result">Ad space</div>
+          </article>
+        </div>
+      </section>
+
+      <section class="how-it-works section">
+        <div class="section-heading">
+          <p class="eyebrow">How it works</p>
+          <h2>Simple upgrade pressure, judged like a real device decision</h2>
+        </div>
+        <div class="how-grid">
+          <article class="info-card"><h3>Speed matters</h3><p>Very slow performance is one of the strongest signs that it is time to upgrade.</p></article>
+          <article class="info-card"><h3>Battery and reliability matter too</h3><p>Battery decline or reliability issues can make an otherwise acceptable device much harder to keep.</p></article>
+          <article class="info-card"><h3>Age adds context</h3><p>A two-year-old device and a five-year-old device should not be judged the same way even if both are slowing a little.</p></article>
+          <article class="info-card"><h3>Usage changes the answer</h3><p>Heavy daily use makes slowdowns feel worse and can justify upgrading sooner.</p></article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Upgrade timing</p>
+          <h2>When should you upgrade</h2>
+          <p>If you are asking should I upgrade, the answer usually depends on how your device performs in real use, whether battery or reliability has started slipping, and how old the hardware already is. The best upgrade or keep device choice is rarely about new features alone.</p>
+        </div>
+      </section>
+
+      <div class="ad-slot ad-mid-content">Ad space</div>
+
+      <section class="examples section" aria-labelledby="upgrade-examples-title">
+        <div class="section-heading">
+          <p class="eyebrow">Real-life examples</p>
+          <h2 id="upgrade-examples-title">Ten should I upgrade examples</h2>
+          <p>These examples cover when to upgrade phone or laptop decisions, and when the smarter move is simply to keep the device you already have.</p>
+        </div>
+        <div class="examples-groups">
+          <section class="example-group">
+            <div class="examples-grid">
+              <article class="example-card"><div class="example-body"><h4>2-year-old iPhone running fast</h4><div class="example-meta"><span>Phone</span><span>2 years</span><span>Fast</span><span>Good battery</span></div><div class="example-result">KEEP</div><p>The device is still recent and performing well, so there is little practical reason to upgrade yet.</p></div></article>
+              <article class="example-card"><div class="example-body"><h4>4-year-old phone with battery drain</h4><div class="example-meta"><span>Phone</span><span>4 years</span><span>Slowing</span><span>Degrading battery</span></div><div class="example-result">UPGRADE</div><p>Age plus battery decline creates enough daily friction that upgrading now makes sense.</p></div></article>
+              <article class="example-card"><div class="example-body"><h4>5-year-old laptop slowing down</h4><div class="example-meta"><span>Laptop</span><span>5 years</span><span>Slowing</span><span>Degrading reliability</span></div><div class="example-result">UPGRADE</div><p>The machine is already older and no longer keeping up well, so upgrade pressure is now strong.</p></div></article>
+              <article class="example-card"><div class="example-body"><h4>1-year-old laptop still fast</h4><div class="example-meta"><span>Laptop</span><span>1 year</span><span>Fast</span><span>Good battery</span></div><div class="example-result">KEEP</div><p>The device is still new and working well, so replacing it now would mostly be preference rather than need.</p></div></article>
+              <article class="example-card"><div class="example-body"><h4>3-year-old tablet moderate use</h4><div class="example-meta"><span>Tablet</span><span>3 years</span><span>Slowing</span><span>Good reliability</span></div><div class="example-result">BORDERLINE</div><p>The device is mid-life and usable, so whether to upgrade depends on how noticeable the slowdown feels in daily use.</p></div></article>
+              <article class="example-card extra-example"><div class="example-body"><h4>TV working perfectly</h4><div class="example-meta"><span>TV</span><span>4 years</span><span>Fast</span><span>Good reliability</span></div><div class="example-result">KEEP</div><p>If the TV still works perfectly, upgrading is usually hard to justify.</p></div></article>
+              <article class="example-card extra-example"><div class="example-body"><h4>Heavy-use laptop slowing</h4><div class="example-meta"><span>Laptop</span><span>4.5 years</span><span>Slowing</span><span>Degrading battery</span></div><div class="example-result">UPGRADE</div><p>Heavy usage makes the slowdown matter more, which pushes the decision toward upgrading.</p></div></article>
+              <article class="example-card extra-example"><div class="example-body"><h4>Phone fine but wants new features</h4><div class="example-meta"><span>Phone</span><span>2.5 years</span><span>Fast</span><span>Good battery</span></div><div class="example-result">BORDERLINE</div><p>The current phone is still solid, so this is more about preference than clear upgrade need.</p></div></article>
+              <article class="example-card extra-example"><div class="example-body"><h4>Old tablet barely usable</h4><div class="example-meta"><span>Tablet</span><span>6 years</span><span>Very slow</span><span>Poor reliability</span></div><div class="example-result">UPGRADE</div><p>Performance and reliability both point clearly toward upgrading.</p></div></article>
+              <article class="example-card extra-example"><div class="example-body"><h4>Recent device light usage</h4><div class="example-meta"><span>Other</span><span>1.5 years</span><span>Fast</span><span>Good reliability</span></div><div class="example-result">KEEP</div><p>Light usage on a recent device usually means there is still plenty of value left.</p></div></article>
+            </div>
+          </section>
+        </div>
+        <button id="examples-toggle" class="examples-toggle" type="button" aria-expanded="false" hidden>Show more examples</button>
+      </section>
+
+      <section class="faq section" aria-labelledby="upgrade-faq-title">
+        <div class="section-heading">
+          <p class="eyebrow">FAQ</p>
+          <h2 id="upgrade-faq-title">Common should I upgrade questions</h2>
+        </div>
+        <div class="faq-list">
+          <details class="faq-item"><summary>Should I upgrade my phone if it still works?</summary><p>If it still runs fast and battery life is acceptable, keeping it is often better value than upgrading early.</p></details>
+          <details class="faq-item"><summary>When should I upgrade my laptop?</summary><p>Usually when slowdowns, poor battery life, or reliability problems start getting in the way of daily work.</p></details>
+          <details class="faq-item"><summary>Does battery health matter more than age?</summary><p>Battery and reliability often matter more in daily life, but age helps explain whether those issues are likely to keep increasing.</p></details>
+          <details class="faq-item"><summary>Is wanting new features enough reason to upgrade?</summary><p>Sometimes, but it is a weaker reason when the current device is still recent and performing well.</p></details>
+          <details class="faq-item"><summary>Can I keep an older device longer?</summary><p>Yes, if it still feels fast enough and reliability is stable for the way you actually use it.</p></details>
+          <details class="faq-item"><summary>What is the best way to judge upgrade or keep device decisions?</summary><p>Look at speed, reliability, age, and usage together instead of focusing on specs alone.</p></details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div>
+        <p class="brand-name">WorthItCheck</p>
+        <p class="footer-copy">Clear decision tools for real-world buying and repair calls.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer">
+        <a href="../../">Home</a>
+        <a href="../">All tools</a>
+        <a href="../../#tool-title">Repair or Replace</a>
+        <a href="../buy-or-wait/">Buy or Wait</a>
+      </nav>
+    </footer>
+  </div>
+
+  <script src="tool.js"></script>
+</body>
+</html>

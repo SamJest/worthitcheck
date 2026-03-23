@@ -602,7 +602,9 @@ input[type="range"] {
 .metrics-row,
 .factor-list,
 .examples-grid,
-.how-grid {
+.how-grid,
+.tool-listing-grid,
+.choice-grid {
   display: grid;
   gap: 0.9rem;
 }
@@ -611,7 +613,8 @@ input[type="range"] {
 .factor-item,
 .info-card,
 .example-card,
-.faq-item {
+.faq-item,
+.tool-listing-card {
   border-radius: var(--radius-lg);
   padding: 1rem;
   position: relative;
@@ -661,11 +664,13 @@ input[type="range"] {
 }
 
 .how-it-works,
+.tools-overview,
 .examples,
 .faq {
   position: relative;
 }
 
+.tools-overview::before,
 .how-it-works::before,
 .examples::before,
 .faq::before {
@@ -706,12 +711,74 @@ input[type="range"] {
   padding-top: 0.85rem;
 }
 
+.reason-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--muted);
+  display: grid;
+  gap: 0.55rem;
+}
+
+.recommendation-note {
+  margin-top: 1rem;
+  padding: 0.95rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(240, 180, 58, 0.2);
+  background: linear-gradient(180deg, rgba(240, 180, 58, 0.09), rgba(255, 255, 255, 0.02));
+}
+
+.recommendation-note strong {
+  color: var(--accent-warm);
+}
+
+.ad-slot {
+  position: relative;
+  margin-top: 1.1rem;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px dashed rgba(240, 180, 58, 0.18);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015));
+  color: var(--muted);
+  text-align: center;
+}
+
+.ad-slot::before {
+  content: "Advertisement";
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 234, 160, 0.8);
+}
+
 .info-card,
 .example-card,
-.faq-item {
+.faq-item,
+.tool-listing-card {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
   border-color: rgba(166, 189, 225, 0.12);
+}
+
+.tool-listing-card h3 {
+  margin-bottom: 0.45rem;
+}
+
+.tool-listing-card p {
+  color: var(--muted);
+}
+
+.text-link {
+  color: var(--accent-strong);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.text-link:hover,
+.text-link:focus-visible {
+  color: var(--accent-warm);
+  outline: none;
 }
 
 .example-meta {
@@ -838,6 +905,42 @@ input[type="range"] {
   font-weight: 700;
 }
 
+.choice-grid {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.choice-option {
+  position: relative;
+}
+
+.choice-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.choice-option span {
+  display: flex;
+  align-items: center;
+  min-height: 3.25rem;
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(6, 15, 28, 0.88), rgba(11, 22, 41, 0.78));
+  color: var(--text);
+  font-weight: 600;
+}
+
+.choice-option input:checked + span {
+  border-color: rgba(240, 180, 58, 0.46);
+  background: linear-gradient(180deg, rgba(240, 180, 58, 0.16), rgba(255, 255, 255, 0.03));
+  box-shadow: 0 0 0 3px rgba(240, 180, 58, 0.08);
+}
+
+.choice-option input:focus-visible + span {
+  box-shadow: 0 0 0 4px rgba(240, 180, 58, 0.12);
+}
+
 @keyframes orbitGlow {
   0%, 100% {
     transform: scale(0.96);
@@ -890,7 +993,9 @@ input[type="range"] {
   .metrics-row,
   .factor-list,
   .how-grid,
-  .examples-grid {
+  .examples-grid,
+  .tool-listing-grid,
+  .choice-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -920,6 +1025,10 @@ input[type="range"] {
 
   .examples-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .tool-listing-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .metrics-row {
