@@ -20,6 +20,7 @@ Use one micro-cycle per release:
 - `improvement-pass-checklist.md`: fixed improvement budget for existing tools
 - `scorecard-template.md`: consistent review scorecard after launch
 - `templates/tool-page/`: starter scaffold for future tool pages
+- `long-tail-clusters.md`: repeatable process for hub pages and scenario pages around existing tools
 
 ## Delivery rules
 - Ship one new tool at a time.

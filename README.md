@@ -17,3 +17,4 @@ Start there for:
 - the new-tool and improvement-pass checklists
 - the scorecard template
 - the reusable page scaffold for future tools
+- the long-tail cluster workflow for search expansion
