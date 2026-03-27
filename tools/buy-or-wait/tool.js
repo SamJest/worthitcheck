@@ -1,3 +1,5 @@
+const TOOL_NAME = "buy_or_wait";
+
 const form = document.querySelector("#buy-wait-form");
 const button = document.querySelector("#bw-submit");
 const message = document.querySelector("#bw-message");
@@ -22,15 +24,14 @@ const steps = [
   "Comparing buy-now vs wait signals..."
 ];
 
-function clearTimers() {
-  while (timers.length) clearTimeout(timers.pop());
-}
-
-function setLoading(isLoading) {
-  button.disabled = isLoading;
-  button.classList.toggle("is-loading", isLoading);
-  button.querySelector(".button-label").textContent = isLoading ? "Analysing..." : "Analyse";
-}
+const {
+  clearTimers,
+  initializeExamplesToggle,
+  revealResultCard,
+  runAnalysis,
+  setLoading,
+  trackEvent
+} = window.WorthItCheckTooling;
 
 function values() {
   const data = new FormData(form);
@@ -134,7 +135,13 @@ function decide(v) {
 function render(result) {
   verdictEl.textContent = result.verdict;
   verdictEl.className = "verdict";
-  verdictEl.classList.add(result.verdict === "BUY" ? "verdict-replace" : result.verdict === "WAIT" ? "verdict-repair" : "verdict-borderline");
+  verdictEl.classList.add(
+    result.verdict === "BUY"
+      ? "verdict-replace"
+      : result.verdict === "WAIT"
+        ? "verdict-repair"
+        : "verdict-borderline"
+  );
   confidenceEl.textContent = `${result.confidence} confidence`;
   confidenceEl.className = "confidence-pill";
   summaryEl.textContent = result.summary;
@@ -142,51 +149,44 @@ function render(result) {
   explainerEl.innerHTML = `<p>${result.explanation}</p>`;
   noteEl.hidden = !result.note;
   noteEl.innerHTML = result.note ? `<strong>${result.note}</strong>` : "";
-  card.hidden = false;
-  card.classList.remove("is-visible");
-  confidenceEl.classList.remove("is-visible");
-  requestAnimationFrame(() => card.classList.add("is-visible"));
-  timers.push(setTimeout(() => confidenceEl.classList.add("is-visible"), 220));
-}
 
-function initExamplesToggle() {
-  if (!examplesToggle || !extraExamples.length) return;
-  examplesToggle.hidden = false;
-  extraExamples.forEach((item) => item.classList.add("is-hidden"));
-  examplesToggle.addEventListener("click", () => {
-    const open = examplesToggle.getAttribute("aria-expanded") === "true";
-    extraExamples.forEach((item) => item.classList.toggle("is-hidden", open));
-    examplesToggle.setAttribute("aria-expanded", String(!open));
-    examplesToggle.textContent = open ? "Show more examples" : "Show fewer examples";
-  });
+  revealResultCard(card, confidenceEl, timers);
 }
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
-  clearTimers();
+  clearTimers(timers);
+
   const v = values();
   const error = validate(v);
+
   if (error) {
     message.textContent = error;
     return;
   }
 
   message.textContent = "";
-  setLoading(true);
-  results.hidden = false;
-  thinking.hidden = false;
-  card.hidden = true;
-  results.scrollIntoView({ behavior: "smooth", block: "start" });
+  setLoading(button, true);
+  trackEvent(TOOL_NAME, "tool_submit");
 
-  steps.forEach((step, index) => {
-    timers.push(setTimeout(() => { thinkingText.textContent = step; }, index * 320));
+  runAnalysis({
+    timers,
+    results,
+    thinking,
+    thinkingText,
+    card,
+    steps,
+    totalDuration: 1500,
+    onComplete() {
+      const result = decide(v);
+      render(result);
+      setLoading(button, false);
+      trackEvent(TOOL_NAME, "tool_result", {
+        verdict: result.verdict,
+        confidence: result.confidence
+      });
+    }
   });
-
-  timers.push(setTimeout(() => {
-    thinking.hidden = true;
-    render(decide(v));
-    setLoading(false);
-  }, 1500));
 });
 
-initExamplesToggle();
+initializeExamplesToggle(examplesToggle, extraExamples);

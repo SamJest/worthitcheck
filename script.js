@@ -116,6 +116,16 @@ function percent(value) {
   return `${Math.round(value * 100)}%`;
 }
 
+function trackEvent(eventName, details = {}) {
+  if (typeof window.gtag !== "function") return;
+
+  window.gtag("event", eventName, {
+    event_category: "tool_interaction",
+    tool_name: "repair_or_replace",
+    ...details
+  });
+}
+
 function getAgeBand(ageRatio) {
   if (ageRatio < 0.35) return { label: "well within", score: 18 };
   if (ageRatio < 0.65) return { label: "comfortably within", score: 7 };
@@ -376,6 +386,10 @@ function runAnalysis(inputs) {
     thinkingPanel.hidden = true;
     renderResult(result);
     setLoadingState(false);
+    trackEvent("tool_result", {
+      verdict: result.verdict,
+      confidence: result.confidence
+    });
   }, duration);
 
   appState.analysisTimerIds.push(finalTimer);
@@ -428,6 +442,7 @@ form.addEventListener("submit", (event) => {
     return;
   }
 
+  trackEvent("tool_submit");
   runAnalysis(validation.data);
 });
 

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lease or Buy Car | Should You Lease or Buy a Car?</title>
+  <meta name="description" content="Use WorthItCheck Lease or Buy Car to compare ownership timeline, mileage, monthly payment pressure, and flexibility before choosing whether to lease or buy.">
+  <link rel="canonical" href="https://worthitcheck.com/tools/lease-or-buy-car/">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="robots" content="index,follow">
+  <meta property="og:title" content="Lease or Buy Car | Should You Lease or Buy a Car?">
+  <meta property="og:description" content="Use WorthItCheck Lease or Buy Car to compare timeline, mileage, payment pressure, and ownership goals before choosing whether to lease or buy.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://worthitcheck.com/tools/lease-or-buy-car/">
+  <meta property="og:site_name" content="WorthItCheck">
+  <meta property="og:image" content="https://worthitcheck.com/assets/worthitcheck-logo.svg">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Lease or Buy Car | Should You Lease or Buy a Car?">
+  <meta name="twitter:description" content="Use WorthItCheck Lease or Buy Car to compare timeline, mileage, payment pressure, and ownership goals before choosing whether to lease or buy.">
+  <meta name="twitter:image" content="https://worthitcheck.com/assets/worthitcheck-logo.svg">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-L2DNF0843E"></script>
+  <script src="../../analytics.js"></script>
+  <link rel="icon" type="image/svg+xml" href="../../assets/worthitcheck-icon.svg">
+  <link rel="apple-touch-icon" href="../../assets/worthitcheck-icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../styles.css">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Lease or Buy Car",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "description": "A practical car decision tool that helps users decide whether leasing or buying is the stronger fit based on timeline, mileage, payment pressure, and ownership preference.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is it better to lease or buy a car for a short time?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A shorter ownership timeline often favors leasing, especially if lower monthly payments and flexibility matter more than building long-term ownership value."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does high mileage make buying better than leasing?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Often yes. Higher annual mileage makes lease limits harder to live with and usually pushes the decision toward buying."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "When does buying usually beat leasing?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Buying usually becomes stronger when you plan to keep the car for many years, drive a lot, care about ownership, or dislike mileage and wear restrictions."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why do lower monthly payments point toward leasing?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Lower monthly payment pressure is one of leasing's biggest practical advantages, especially when long-term ownership is not a priority."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can lease vs buy be a borderline decision?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Mid-length timelines with mixed ownership and payment priorities often produce a close call where either option can be defended."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is this a full lease vs buy calculator?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. WorthItCheck gives a practical heuristic recommendation rather than a full finance calculation with taxes, APR, or dealer-specific terms."
+          }
+        }
+      ]
+    }
+  </script>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <a class="brand-lockup" href="../../">
+        <img class="brand-logo" src="../../assets/worthitcheck-logo.svg" alt="WorthItCheck">
+      </a>
+      <a class="header-link" href="../">All tools</a>
+    </header>
+
+    <main>
+      <section class="hero section">
+        <div class="hero-copy">
+          <p class="eyebrow">Tool 5</p>
+          <h1>Should I lease or buy a car?</h1>
+          <p class="hero-subheading">WorthItCheck weighs timeline, annual mileage, payment pressure, ownership preference, and flexibility so you can judge whether leasing or buying is the stronger fit.</p>
+          <div class="trust-strip" aria-label="Decision signals used">
+            <span>Timeline fit</span>
+            <span>Mileage pressure</span>
+            <span>Payment flexibility</span>
+            <span>Ownership pull</span>
+          </div>
+        </div>
+
+        <section class="tool-card" aria-labelledby="lease-buy-title">
+          <div class="tool-card__header">
+            <p class="tool-chip">Lease or Buy Car</p>
+            <h2 id="lease-buy-title">Car lease vs buy</h2>
+            <p>Answer a few practical questions and get a clear recommendation.</p>
+          </div>
+
+          <form id="lease-buy-form" class="decision-form" novalidate>
+            <div class="field-grid">
+              <label class="field">
+                <span>How long do you expect to keep the car?</span>
+                <div class="input-with-suffix">
+                  <input id="lease-years" name="years" type="number" min="1" max="12" step="0.5" placeholder="e.g. 3" required>
+                  <span>years</span>
+                </div>
+              </label>
+
+              <label class="field">
+                <span>Annual mileage</span>
+                <div class="input-with-suffix">
+                  <input id="lease-mileage" name="mileage" type="number" min="1000" max="50000" step="500" placeholder="e.g. 12000" required>
+                  <span>miles</span>
+                </div>
+              </label>
+
+              <fieldset class="field">
+                <legend>Importance of lower monthly payments</legend>
+                <div class="choice-grid">
+                  <label class="choice-option"><input type="radio" name="payment" value="low" checked><span>Low</span></label>
+                  <label class="choice-option"><input type="radio" name="payment" value="medium"><span>Medium</span></label>
+                  <label class="choice-option"><input type="radio" name="payment" value="high"><span>High</span></label>
+                </div>
+              </fieldset>
+
+              <fieldset class="field">
+                <legend>Importance of owning the car long term</legend>
+                <div class="choice-grid">
+                  <label class="choice-option"><input type="radio" name="ownership" value="low" checked><span>Low</span></label>
+                  <label class="choice-option"><input type="radio" name="ownership" value="medium"><span>Medium</span></label>
+                  <label class="choice-option"><input type="radio" name="ownership" value="high"><span>High</span></label>
+                </div>
+              </fieldset>
+
+              <fieldset class="field">
+                <legend>Desire to drive a newer car more often</legend>
+                <div class="choice-grid">
+                  <label class="choice-option"><input type="radio" name="newCar" value="low" checked><span>Low</span></label>
+                  <label class="choice-option"><input type="radio" name="newCar" value="medium"><span>Medium</span></label>
+                  <label class="choice-option"><input type="radio" name="newCar" value="high"><span>High</span></label>
+                </div>
+              </fieldset>
+
+              <fieldset class="field">
+                <legend>Tolerance for mileage and wear restrictions</legend>
+                <div class="choice-grid">
+                  <label class="choice-option"><input type="radio" name="restrictions" value="low" checked><span>Low</span></label>
+                  <label class="choice-option"><input type="radio" name="restrictions" value="medium"><span>Medium</span></label>
+                  <label class="choice-option"><input type="radio" name="restrictions" value="high"><span>High</span></label>
+                </div>
+              </fieldset>
+
+              <fieldset class="field">
+                <legend>Are your needs likely to change in the next few years?</legend>
+                <div class="choice-grid">
+                  <label class="choice-option"><input type="radio" name="change" value="no" checked><span>No</span></label>
+                  <label class="choice-option"><input type="radio" name="change" value="yes"><span>Yes</span></label>
+                </div>
+              </fieldset>
+            </div>
+
+            <div id="lease-buy-message" class="form-message" role="status" aria-live="polite"></div>
+            <button id="lease-buy-submit" class="analyze-button" type="submit">
+              <span class="button-label">Analyze</span>
+              <span class="button-pulse" aria-hidden="true"></span>
+            </button>
+          </form>
+        </section>
+      </section>
+
+      <section id="lease-buy-results" class="results section" aria-live="polite" hidden>
+        <div class="results-shell">
+          <div class="thinking-panel" id="lease-buy-thinking" hidden>
+            <div class="thinking-orb" aria-hidden="true"></div>
+            <p class="thinking-label">WorthItCheck is reviewing the car ownership signals</p>
+            <p id="lease-buy-thinking-text" class="thinking-text">Checking ownership timeline...</p>
+          </div>
+
+          <article id="lease-buy-card" class="result-card" hidden>
+            <div class="result-card__topline">
+              <span class="result-label">Decision verdict</span>
+              <span id="lease-buy-confidence" class="confidence-pill"></span>
+            </div>
+            <div class="verdict-row">
+              <h2 id="lease-buy-verdict" class="verdict">BORDERLINE</h2>
+              <p id="lease-buy-summary" class="summary"></p>
+            </div>
+            <ul id="lease-buy-reasons" class="reason-list"></ul>
+            <div id="lease-buy-note" class="recommendation-note" hidden></div>
+            <details class="reasoning-details">
+              <summary>See full reasoning</summary>
+              <div id="lease-buy-explainer" class="reasoning-copy"></div>
+            </details>
+          </article>
+        </div>
+      </section>
+
+      <section class="how-it-works section">
+        <div class="section-heading">
+          <p class="eyebrow">How it works</p>
+          <h2>Simple car ownership tradeoffs, weighted like a real decision</h2>
+        </div>
+        <div class="how-grid">
+          <article class="info-card"><h3>Timeline matters first</h3><p>Shorter timelines often favor leasing. Longer timelines usually make buying more attractive.</p></article>
+          <article class="info-card"><h3>Mileage changes everything</h3><p>Higher annual mileage makes lease limits harder to live with and is one of the strongest reasons to buy instead.</p></article>
+          <article class="info-card"><h3>Payments vs ownership</h3><p>Lower monthly payments support leasing, while long-term ownership value supports buying.</p></article>
+          <article class="info-card"><h3>Flexibility still counts</h3><p>If your needs may change soon or you like driving newer cars more often, leasing gains practical value.</p></article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Lease vs buy</p>
+          <h2>When should you lease vs buy a car</h2>
+          <p>If you are asking whether to lease or buy a car, the most important signals are how long you expect to keep it, how much you drive, whether lower monthly payments matter more than ownership, and how comfortable you are with mileage and wear limits. This tool gives a practical heuristic answer, not a dealer-style finance worksheet.</p>
+        </div>
+      </section>
+
+      <section class="examples section" aria-labelledby="lease-buy-examples-title">
+        <div class="section-heading">
+          <p class="eyebrow">Real-life examples</p>
+          <h2 id="lease-buy-examples-title">Ten lease vs buy car examples</h2>
+          <p>These examples show how mileage, timeline, payment pressure, and ownership goals can change the answer.</p>
+        </div>
+        <div class="examples-groups">
+          <section class="example-group">
+            <div class="examples-grid">
+              <article class="example-card"><div class="example-body"><h4>2-year timeline with low mileage</h4><div class="example-meta"><span>2 years</span><span>9,000 miles</span><span>High payment pressure</span></div><div class="example-result">LEASE</div><p>A short timeline, manageable mileage, and preference for lower monthly payments make leasing the cleaner fit.</p></div></article>
+              <article class="example-card"><div class="example-body"><h4>7-year ownership plan</h4><div class="example-meta"><span>7 years</span><span>14,000 miles</span><span>Wants ownership</span></div><div class="example-result">BUY</div><p>A long timeline and strong ownership preference are two of the clearest reasons to buy rather than lease.</p></div></article>
+              <article class="example-card"><div class="example-body"><h4>3-year plan and likes new cars</h4><div class="example-meta"><span>3 years</span><span>11,000 miles</span><span>Likes new tech</span></div><div class="example-result">LEASE</div><p>If you like switching into newer cars every few years, leasing usually matches that lifestyle better.</p></div></article>
+              <article class="example-card"><div class="example-body"><h4>5-year plan with low mileage</h4><div class="example-meta"><span>5 years</span><span>8,000 miles</span><span>Medium ownership pull</span></div><div class="example-result">BUY</div><p>Even with lower mileage, a longer timeline pushes the value toward buying because you plan to keep the car.</p></div></article>
+              <article class="example-card"><div class="example-body"><h4>4-year timeline with mixed goals</h4><div class="example-meta"><span>4 years</span><span>12,000 miles</span><span>Mixed priorities</span></div><div class="example-result">BORDERLINE</div><p>This is the kind of mid-range case where payment preference and ownership goals can pull in different directions.</p></div></article>
+              <article class="example-card extra-example"><div class="example-body"><h4>Needs may change soon</h4><div class="example-meta"><span>2.5 years</span><span>10,000 miles</span><span>Changing needs likely</span></div><div class="example-result">LEASE</div><p>Short-term uncertainty makes flexibility more valuable, which strengthens the case for leasing.</p></div></article>
+              <article class="example-card extra-example"><div class="example-body"><h4>High-mileage commuter</h4><div class="example-meta"><span>6 years</span><span>22,000 miles</span><span>Stable needs</span></div><div class="example-result">BUY</div><p>High mileage plus a longer timeline is one of the strongest combinations for buying.</p></div></article>
+              <article class="example-card extra-example"><div class="example-body"><h4>Lower payments matter most</h4><div class="example-meta"><span>3 years</span><span>10,500 miles</span><span>High payment focus</span></div><div class="example-result">LEASE</div><p>If monthly affordability matters most and mileage is manageable, leasing often wins on practicality.</p></div></article>
+              <article class="example-card extra-example"><div class="example-body"><h4>Dislikes mileage limits</h4><div class="example-meta"><span>5 years</span><span>15,000 miles</span><span>Low tolerance for rules</span></div><div class="example-result">BUY</div><p>If lease restrictions already sound frustrating, buying is usually the easier fit even before finance details enter the picture.</p></div></article>
+              <article class="example-card extra-example"><div class="example-body"><h4>Wants new cars but drives a lot</h4><div class="example-meta"><span>4 years</span><span>18,000 miles</span><span>High new-car pull</span></div><div class="example-result">BORDERLINE</div><p>The desire for newer cars supports leasing, but high mileage pushes hard in the other direction, so the decision stays close.</p></div></article>
+            </div>
+          </section>
+        </div>
+        <button id="examples-toggle" class="examples-toggle" type="button" aria-expanded="false" hidden>Show more examples</button>
+      </section>
+
+      <section class="faq section" aria-labelledby="lease-buy-faq-title">
+        <div class="section-heading">
+          <p class="eyebrow">FAQ</p>
+          <h2 id="lease-buy-faq-title">Common lease vs buy car questions</h2>
+        </div>
+        <div class="faq-list">
+          <details class="faq-item"><summary>Is it better to lease or buy a car for a short time?</summary><p>Often lease, especially if lower monthly payments and flexibility matter more than long-term ownership value.</p></details>
+          <details class="faq-item"><summary>Does high mileage make buying better than leasing?</summary><p>Usually yes. Higher mileage can make lease limits harder to live with and pushes the decision toward buying.</p></details>
+          <details class="faq-item"><summary>When does buying usually beat leasing?</summary><p>Buying usually becomes stronger when you plan to keep the car for many years, drive a lot, care about ownership, or dislike lease restrictions.</p></details>
+          <details class="faq-item"><summary>Why do lower monthly payments point toward leasing?</summary><p>Lower monthly cost is one of leasing's biggest practical advantages, especially when long-term ownership is not a major priority.</p></details>
+          <details class="faq-item"><summary>Can lease vs buy be a borderline decision?</summary><p>Yes. Mid-length timelines with mixed payment and ownership goals often produce a close call that is not one-sided.</p></details>
+          <details class="faq-item"><summary>Is this a full lease vs buy calculator?</summary><p>No. WorthItCheck gives a practical heuristic recommendation rather than a full finance calculation with APR, taxes, or dealer-specific terms.</p></details>
+        </div>
+      </section>
+
+      <section class="tools-overview section" aria-labelledby="lease-buy-related-title">
+        <div class="section-heading">
+          <p class="eyebrow">Related tools</p>
+          <h2 id="lease-buy-related-title">What should you check next?</h2>
+          <p>After lease vs buy, the next useful question is often whether timing, overall ownership cost, or keeping the current car changes the smarter move.</p>
+        </div>
+        <div class="tool-listing-grid">
+          <article class="tool-listing-card">
+            <p class="tool-chip">Related</p>
+            <h3>New or Used Car</h3>
+            <p>If you already know you want to buy rather than lease, compare whether new-car certainty or used-car value is the better fit.</p>
+            <a class="text-link" href="../new-or-used-car/">Open tool</a>
+          </article>
+          <article class="tool-listing-card">
+            <p class="tool-chip">Related</p>
+            <h3>Buy or Wait</h3>
+            <p>If timing is still the bigger question, compare whether buying now or waiting changes the value enough to matter.</p>
+            <a class="text-link" href="../buy-or-wait/">Open tool</a>
+          </article>
+          <article class="tool-listing-card">
+            <p class="tool-chip">Related</p>
+            <h3>Repair or Replace</h3>
+            <p>If this decision is driven by an aging current vehicle, check whether repairing it still buys enough useful life.</p>
+            <a class="text-link" href="../../#tool-title">Open tool</a>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div>
+        <p class="brand-name">WorthItCheck</p>
+        <p class="footer-copy">Clear decision tools for real-world buying and repair calls.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer">
+        <a href="../../">Home</a>
+        <a href="../">All tools</a>
+        <a href="../../#tool-title">Repair or Replace</a>
+        <a href="../buy-or-wait/">Buy or Wait</a>
+        <a href="../rent-vs-buy/">Rent vs Buy</a>
+        <a href="../new-or-used-car/">New or Used Car</a>
+      </nav>
+    </footer>
+  </div>
+
+  <script src="../tooling.js"></script>
+  <script src="tool.js"></script>
+</body>
+</html>

@@ -1,3 +1,5 @@
+const TOOL_NAME = "rent_vs_buy";
+
 const form = document.querySelector("#rent-buy-form");
 const button = document.querySelector("#rent-buy-submit");
 const message = document.querySelector("#rent-buy-message");
@@ -14,6 +16,7 @@ const reasonsEl = document.querySelector("#rent-buy-reasons");
 const explainerEl = document.querySelector("#rent-buy-explainer");
 const examplesToggle = document.querySelector("#examples-toggle");
 const extraExamples = Array.from(document.querySelectorAll(".extra-example"));
+
 const timers = [];
 const steps = [
   "Calculating long-term costs...",
@@ -21,13 +24,23 @@ const steps = [
   "Evaluating your timeline..."
 ];
 
-function clearTimers() { while (timers.length) clearTimeout(timers.pop()); }
-function gbp(v) { return new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 }).format(v); }
-function setLoading(on) {
-  button.disabled = on;
-  button.classList.toggle("is-loading", on);
-  button.querySelector(".button-label").textContent = on ? "Analysing..." : "Analyse";
+const {
+  clearTimers,
+  initializeExamplesToggle,
+  revealResultCard,
+  runAnalysis,
+  setLoading,
+  trackEvent
+} = window.WorthItCheckTooling;
+
+function gbp(value) {
+  return new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: "GBP",
+    maximumFractionDigits: 0
+  }).format(value);
 }
+
 function values() {
   const data = new FormData(form);
   return {
@@ -38,6 +51,7 @@ function values() {
     stability: data.get("stability")
   };
 }
+
 function validate(v) {
   if (!Number.isFinite(v.rent) || v.rent <= 0) return "Enter a valid monthly rent.";
   if (!Number.isFinite(v.price) || v.price <= 0) return "Enter a valid purchase price.";
@@ -45,6 +59,7 @@ function validate(v) {
   if (!Number.isFinite(v.years) || v.years <= 0) return "Enter a valid time horizon.";
   return "";
 }
+
 function decide(v) {
   const totalRent = v.rent * 12 * v.years;
   const totalOwnership = v.price + (v.ownership * 12 * v.years);
@@ -69,7 +84,7 @@ function decide(v) {
     reasons.push("Long-term stability makes buying easier to justify.");
   } else if (v.stability === "short") {
     score -= 1;
-    reasons.push("Short-term plans favour flexibility, which supports renting.");
+    reasons.push("Short-term plans favor flexibility, which supports renting.");
   }
   if (v.years < 3) score -= 1;
 
@@ -92,51 +107,62 @@ function decide(v) {
 
   return { verdict, confidence, totalRent, totalOwnership, reasons: reasons.slice(0, 4), summary, explanation };
 }
+
 function render(result) {
   verdictEl.textContent = result.verdict;
   verdictEl.className = "verdict";
-  verdictEl.classList.add(result.verdict === "BUY" ? "verdict-repair" : result.verdict === "RENT" ? "verdict-replace" : "verdict-borderline");
+  verdictEl.classList.add(
+    result.verdict === "BUY"
+      ? "verdict-repair"
+      : result.verdict === "RENT"
+        ? "verdict-replace"
+        : "verdict-borderline"
+  );
   confidenceEl.textContent = `${result.confidence} confidence`;
   confidenceEl.className = "confidence-pill";
   summaryEl.textContent = result.summary;
   rentTotalEl.textContent = gbp(result.totalRent);
   buyTotalEl.textContent = gbp(result.totalOwnership);
-  reasonsEl.innerHTML = result.reasons.map((r) => `<li>${r}</li>`).join("");
+  reasonsEl.innerHTML = result.reasons.map((reason) => `<li>${reason}</li>`).join("");
   explainerEl.innerHTML = `<p>${result.explanation}</p>`;
-  card.hidden = false;
-  card.classList.remove("is-visible");
-  confidenceEl.classList.remove("is-visible");
-  requestAnimationFrame(() => card.classList.add("is-visible"));
-  timers.push(setTimeout(() => confidenceEl.classList.add("is-visible"), 220));
+
+  revealResultCard(card, confidenceEl, timers);
 }
-function initExamplesToggle() {
-  if (!examplesToggle || !extraExamples.length) return;
-  examplesToggle.hidden = false;
-  extraExamples.forEach((item) => item.classList.add("is-hidden"));
-  examplesToggle.addEventListener("click", () => {
-    const open = examplesToggle.getAttribute("aria-expanded") === "true";
-    extraExamples.forEach((item) => item.classList.toggle("is-hidden", open));
-    examplesToggle.setAttribute("aria-expanded", String(!open));
-    examplesToggle.textContent = open ? "Show more examples" : "Show fewer examples";
-  });
-}
+
 form.addEventListener("submit", (event) => {
   event.preventDefault();
-  clearTimers();
+  clearTimers(timers);
+
   const v = values();
   const error = validate(v);
-  if (error) { message.textContent = error; return; }
+
+  if (error) {
+    message.textContent = error;
+    return;
+  }
+
   message.textContent = "";
-  setLoading(true);
-  results.hidden = false;
-  thinking.hidden = false;
-  card.hidden = true;
-  results.scrollIntoView({ behavior: "smooth", block: "start" });
-  steps.forEach((step, i) => timers.push(setTimeout(() => { thinkingText.textContent = step; }, i * 340)));
-  timers.push(setTimeout(() => {
-    thinking.hidden = true;
-    render(decide(v));
-    setLoading(false);
-  }, 1500));
+  setLoading(button, true);
+  trackEvent(TOOL_NAME, "tool_submit");
+
+  runAnalysis({
+    timers,
+    results,
+    thinking,
+    thinkingText,
+    card,
+    steps,
+    totalDuration: 1500,
+    onComplete() {
+      const result = decide(v);
+      render(result);
+      setLoading(button, false);
+      trackEvent(TOOL_NAME, "tool_result", {
+        verdict: result.verdict,
+        confidence: result.confidence
+      });
+    }
+  });
 });
-initExamplesToggle();
+
+initializeExamplesToggle(examplesToggle, extraExamples);

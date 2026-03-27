@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+  <meta name="description" content="{{META_DESCRIPTION}}">
+  <link rel="canonical" href="{{CANONICAL_URL}}">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="robots" content="index,follow">
+  <meta property="og:title" content="{{OG_TITLE}}">
+  <meta property="og:description" content="{{OG_DESCRIPTION}}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{CANONICAL_URL}}">
+  <meta property="og:site_name" content="WorthItCheck">
+  <meta property="og:image" content="https://worthitcheck.com/assets/worthitcheck-logo.svg">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="{{OG_TITLE}}">
+  <meta name="twitter:description" content="{{OG_DESCRIPTION}}">
+  <meta name="twitter:image" content="https://worthitcheck.com/assets/worthitcheck-logo.svg">
+  <link rel="icon" type="image/svg+xml" href="../../assets/worthitcheck-icon.svg">
+  <link rel="apple-touch-icon" href="../../assets/worthitcheck-icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../styles.css">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-L2DNF0843E"></script>
+  <script src="../../analytics.js"></script>
+  <!-- Add one WebApplication schema block and one FAQPage schema block before launch. -->
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <a class="brand-lockup" href="../../">
+        <img class="brand-logo" src="../../assets/worthitcheck-logo.svg" alt="WorthItCheck">
+      </a>
+      <a class="header-link" href="../">All tools</a>
+    </header>
+
+    <main>
+      <section class="hero section">
+        <div class="hero-copy">
+          <p class="eyebrow">{{TOOL_NUMBER}}</p>
+          <h1>{{H1}}</h1>
+          <p class="hero-subheading">{{HERO_SUBHEADING}}</p>
+          <div class="trust-strip" aria-label="Decision signals used">
+            <span>{{SIGNAL_1}}</span>
+            <span>{{SIGNAL_2}}</span>
+            <span>{{SIGNAL_3}}</span>
+            <span>{{SIGNAL_4}}</span>
+          </div>
+        </div>
+
+        <section class="tool-card" aria-labelledby="{{ID_PREFIX}}-title">
+          <div class="tool-card__header">
+            <p class="tool-chip">{{TOOL_NAME}}</p>
+            <h2 id="{{ID_PREFIX}}-title">{{RESULT_CARD_TITLE}}</h2>
+            <p>{{FORM_INTRO}}</p>
+          </div>
+
+          <form id="{{ID_PREFIX}}-form" class="decision-form" novalidate>
+            <div class="field-grid">
+              <!-- Replace with tool-specific fields -->
+            </div>
+
+            <div id="{{ID_PREFIX}}-message" class="form-message" role="status" aria-live="polite"></div>
+            <button id="{{ID_PREFIX}}-submit" class="analyze-button" type="submit">
+              <span class="button-label">Analyze</span>
+              <span class="button-pulse" aria-hidden="true"></span>
+            </button>
+          </form>
+        </section>
+      </section>
+
+      <section id="{{ID_PREFIX}}-results" class="results section" aria-live="polite" hidden>
+        <div class="results-shell">
+          <div class="thinking-panel" id="{{ID_PREFIX}}-thinking" hidden>
+            <div class="thinking-orb" aria-hidden="true"></div>
+            <p class="thinking-label">WorthItCheck is reviewing the signals</p>
+            <p id="{{ID_PREFIX}}-thinking-text" class="thinking-text">{{THINKING_STEP_1}}</p>
+          </div>
+
+          <article id="{{ID_PREFIX}}-card" class="result-card" hidden>
+            <div class="result-card__topline">
+              <span class="result-label">Decision verdict</span>
+              <span id="{{ID_PREFIX}}-confidence" class="confidence-pill"></span>
+            </div>
+            <div class="verdict-row">
+              <h2 id="{{ID_PREFIX}}-verdict" class="verdict">{{DEFAULT_VERDICT}}</h2>
+              <p id="{{ID_PREFIX}}-summary" class="summary"></p>
+            </div>
+            <ul id="{{ID_PREFIX}}-reasons" class="reason-list"></ul>
+            <details class="reasoning-details">
+              <summary>See full reasoning</summary>
+              <div id="{{ID_PREFIX}}-explainer" class="reasoning-copy"></div>
+            </details>
+          </article>
+        </div>
+      </section>
+
+      <section class="tools-overview section" aria-labelledby="{{ID_PREFIX}}-related-title">
+        <div class="section-heading">
+          <p class="eyebrow">Related tools</p>
+          <h2 id="{{ID_PREFIX}}-related-title">Keep the decision moving</h2>
+          <p>Give every tool page an obvious next click so users can continue to a related decision.</p>
+        </div>
+        <div class="tool-listing-grid">
+          <!-- Replace with 2-3 related tool cards -->
+        </div>
+      </section>
+
+      <section class="examples section" aria-labelledby="{{ID_PREFIX}}-examples-title">
+        <div class="section-heading">
+          <p class="eyebrow">Real-life examples</p>
+          <h2 id="{{ID_PREFIX}}-examples-title">Ten example scenarios</h2>
+          <p>Draft these from the brief before final QA.</p>
+        </div>
+        <div class="examples-groups">
+          <section class="example-group">
+            <div class="examples-grid">
+              <!-- Add 10 example cards, mark overflow cards with .extra-example -->
+            </div>
+          </section>
+        </div>
+        <button id="examples-toggle" class="examples-toggle" type="button" aria-expanded="false" hidden>Show more examples</button>
+      </section>
+
+      <section class="faq section" aria-labelledby="{{ID_PREFIX}}-faq-title">
+        <div class="section-heading">
+          <p class="eyebrow">FAQ</p>
+          <h2 id="{{ID_PREFIX}}-faq-title">Common questions</h2>
+        </div>
+        <div class="faq-list">
+          <!-- Add 5-6 details/summary FAQ items -->
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div>
+        <p class="brand-name">WorthItCheck</p>
+        <p class="footer-copy">Clear decision tools for real-world buying and repair calls.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer">
+        <a href="../../">Home</a>
+        <a href="../">All tools</a>
+      </nav>
+    </footer>
+  </div>
+
+  <script src="../tooling.js"></script>
+  <script src="tool.js"></script>
+</body>
+</html>
