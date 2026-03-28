@@ -719,6 +719,30 @@ input[type="range"] {
   gap: 0.55rem;
 }
 
+.decision-subsection {
+  margin-top: 1.25rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid rgba(166, 189, 225, 0.12);
+}
+
+.decision-subsection h3 {
+  margin-bottom: 0.75rem;
+}
+
+.generated-examples-grid {
+  margin-top: 0.2rem;
+}
+
+.example-card-generated {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02));
+  border-color: rgba(166, 189, 225, 0.12);
+}
+
+.example-card-generated .example-result {
+  margin-bottom: 0.8rem;
+}
+
 .recommendation-note {
   margin-top: 1rem;
   padding: 0.95rem 1rem;

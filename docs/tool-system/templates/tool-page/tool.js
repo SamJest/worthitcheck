@@ -12,6 +12,11 @@ const confidenceEl = document.querySelector("#{{ID_PREFIX}}-confidence");
 const summaryEl = document.querySelector("#{{ID_PREFIX}}-summary");
 const reasonsEl = document.querySelector("#{{ID_PREFIX}}-reasons");
 const explainerEl = document.querySelector("#{{ID_PREFIX}}-explainer");
+const practicalMetricOneEl = document.querySelector("#{{ID_PREFIX}}-practical-metric-1");
+const practicalMetricTwoEl = document.querySelector("#{{ID_PREFIX}}-practical-metric-2");
+const practicalMetricThreeEl = document.querySelector("#{{ID_PREFIX}}-practical-metric-3");
+const realLifeEl = document.querySelector("#{{ID_PREFIX}}-real-life");
+const generatedExamplesEl = document.querySelector("#{{ID_PREFIX}}-generated-examples");
 const examplesToggle = document.querySelector("#examples-toggle");
 const extraExamples = Array.from(document.querySelectorAll(".extra-example"));
 
@@ -25,7 +30,9 @@ const steps = [
 const {
   clearTimers,
   initializeExamplesToggle,
+  renderExampleScenarios,
   revealResultCard,
+  runDecisionEngine,
   runAnalysis,
   setLoading,
   trackEvent
@@ -44,15 +51,54 @@ function validate(values) {
   return "";
 }
 
-function decide(values) {
-  // Return: verdict, confidence, summary, reasons, explanation
-  return {
-    verdict: "BORDERLINE",
-    confidence: "Low",
-    summary: "",
-    reasons: [],
-    explanation: ""
-  };
+function buildExamples(values) {
+  // Return 2-3 lightweight scenarios:
+  // [{ title, meta: [], verdict, description }]
+  return [];
+}
+
+function decide(values, options) {
+  const includeExamples = !options || options.includeExamples !== false;
+
+  // Replace with page-specific scoring and practical signals.
+  const score = 0;
+  const closeness = 0;
+  const reasons = [];
+  const realLife = [];
+
+  const result = runDecisionEngine({
+    score,
+    closeness,
+    thresholds: {
+      positive: 2,
+      negative: -2
+    },
+    verdicts: {
+      positive: "{{POSITIVE_VERDICT}}",
+      negative: "{{NEGATIVE_VERDICT}}",
+      neutral: "BORDERLINE"
+    },
+    reasons,
+    realLife,
+    summaryByVerdict: {
+      "{{POSITIVE_VERDICT}}": "",
+      "{{NEGATIVE_VERDICT}}": "",
+      BORDERLINE: ""
+    },
+    explanationByVerdict: {
+      "{{POSITIVE_VERDICT}}": "",
+      "{{NEGATIVE_VERDICT}}": "",
+      BORDERLINE: ""
+    },
+    details: {
+      metricOne: "{{METRIC_VALUE_1}}",
+      metricTwo: "{{METRIC_VALUE_2}}",
+      metricThree: "{{METRIC_VALUE_3}}"
+    }
+  });
+
+  result.examples = includeExamples ? buildExamples(values) : [];
+  return result;
 }
 
 function render(result) {
@@ -66,11 +112,16 @@ function render(result) {
         : "verdict-replace"
   );
 
-  confidenceEl.textContent = `${result.confidence} confidence`;
+  confidenceEl.textContent = result.confidenceText;
   confidenceEl.className = "confidence-pill";
   summaryEl.textContent = result.summary;
   reasonsEl.innerHTML = result.reasons.map((reason) => `<li>${reason}</li>`).join("");
+  practicalMetricOneEl.textContent = result.details.metricOne || "{{METRIC_VALUE_1}}";
+  practicalMetricTwoEl.textContent = result.details.metricTwo || "{{METRIC_VALUE_2}}";
+  practicalMetricThreeEl.textContent = result.details.metricThree || "{{METRIC_VALUE_3}}";
+  realLifeEl.innerHTML = result.realLife.map((item) => `<li>${item}</li>`).join("");
   explainerEl.innerHTML = `<p>${result.explanation}</p>`;
+  renderExampleScenarios(generatedExamplesEl, result.examples);
 
   revealResultCard(card, confidenceEl, timers);
 }
@@ -100,12 +151,12 @@ form.addEventListener("submit", (event) => {
     steps,
     totalDuration: 1500,
     onComplete() {
-      const result = decide(values);
+      const result = decide(values, { includeExamples: true });
       render(result);
       setLoading(button, false);
       trackEvent(TOOL_NAME, "tool_result", {
         verdict: result.verdict,
-        confidence: result.confidence
+        confidence: result.confidenceScore
       });
     }
   });

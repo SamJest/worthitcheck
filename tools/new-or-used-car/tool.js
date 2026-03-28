@@ -13,6 +13,11 @@ const summaryEl = document.querySelector("#new-used-summary");
 const reasonsEl = document.querySelector("#new-used-reasons");
 const explainerEl = document.querySelector("#new-used-explainer");
 const noteEl = document.querySelector("#new-used-note");
+const budgetPressureEl = document.querySelector("#new-used-budget-pressure");
+const certaintyNeedEl = document.querySelector("#new-used-certainty-need");
+const practicalLeanEl = document.querySelector("#new-used-practical-lean");
+const realLifeEl = document.querySelector("#new-used-real-life");
+const generatedExamplesEl = document.querySelector("#new-used-generated-examples");
 const examplesToggle = document.querySelector("#examples-toggle");
 const extraExamples = Array.from(document.querySelectorAll(".extra-example"));
 
@@ -27,8 +32,10 @@ const steps = [
 const {
   clearTimers,
   initializeExamplesToggle,
+  renderExampleScenarios,
   revealResultCard,
   runAnalysis,
+  runDecisionEngine,
   setLoading,
   trackEvent
 } = window.WorthItCheckTooling;
@@ -53,7 +60,26 @@ function validate(v) {
   return "";
 }
 
-function decide(v) {
+function getBudgetPressure(v, verdict) {
+  if (verdict === "USED" && v.budget === "high") return "High used-car pull";
+  if (verdict === "NEW" && v.budget === "low") return "Budget allows new";
+  return "Moderate";
+}
+
+function getCertaintyNeed(v, verdict) {
+  if (verdict === "NEW" && (v.warranty === "high" || v.risk === "low")) return "New-car certainty matters";
+  if (verdict === "USED" && v.inspection === "yes") return "Used risk is manageable";
+  return "Mixed";
+}
+
+function getPracticalLean(verdict) {
+  if (verdict === "NEW") return "Warranty and predictability";
+  if (verdict === "USED") return "Value and lower upfront spend";
+  return "Comfort with risk decides";
+}
+
+function evaluateScenario(v, options) {
+  const includeExamples = !options || options.includeExamples !== false;
   let score = 0;
   const reasons = [];
   let note = "";
@@ -147,35 +173,87 @@ function decide(v) {
     reasons.push("Higher mileage plus a longer ownership plan strongly reinforces the case for new.");
   }
 
-  let verdict = "BORDERLINE";
-  if (score >= 4) verdict = "NEW";
-  else if (score <= -4) verdict = "USED";
+  let verdictOverride = "";
+  if (v.budget === "high" && v.years <= 3 && v.risk !== "low") verdictOverride = "USED";
+  if (v.warranty === "high" && v.risk === "low" && v.years >= 6) verdictOverride = "NEW";
 
-  if (v.budget === "high" && v.years <= 3 && v.risk !== "low") verdict = "USED";
-  if (v.warranty === "high" && v.risk === "low" && v.years >= 6) verdict = "NEW";
+  const result = runDecisionEngine({
+    score,
+    maxScore: 14,
+    closeness: Math.min(Math.abs(score) / 14, 1),
+    thresholds: { positive: 4, negative: -4 },
+    verdicts: { positive: "NEW", negative: "USED", neutral: "BORDERLINE" },
+    verdictOverride,
+    reasons,
+    realLife: [
+      v.budget === "high"
+        ? "In real life, paying less up front is doing a lot of work here, so used value matters more than a perfectly clean starting point."
+        : "In real life, you have more room to pay for certainty if it genuinely reduces stress and future surprises.",
+      v.warranty === "high" || v.risk === "low"
+        ? "Because predictability matters to you, the extra money for new buys more than just smell and shiny paint."
+        : "Because you can tolerate some uncertainty, the extra new-car premium has to work harder to justify itself.",
+      v.inspection === "yes"
+        ? "Having a trusted inspection path makes a used car much safer than it would be for a buyer going in blind."
+        : "Without a trusted inspection or mechanic, used risk stays more expensive than it first looks.",
+      v.years >= 6
+        ? "A longer ownership plan gives reliability and warranty certainty more time to matter."
+        : "A shorter ownership plan makes it harder to recover the extra price of buying new."
+    ],
+    summaryByVerdict: {
+      NEW: "Buying new looks stronger because warranty certainty, long-term use, or low tolerance for used-car risk are doing more work than the upfront savings of used.",
+      USED: "Buying used looks stronger because upfront value and your comfort with used-car risk matter more than paying a premium for certainty.",
+      BORDERLINE: "This is a close call: the case for used-car value is real, but so is the appeal of warranty certainty and a cleaner starting point."
+    },
+    explanationByVerdict: {
+      NEW: "The strongest new-car cases usually combine longer ownership, heavier use, stronger warranty needs, or low tolerance for surprise issues. Those are the signals doing the most work in your answers.",
+      USED: "The strongest used-car cases usually combine stronger price pressure, shorter ownership, and enough comfort with inspection and maintenance risk to make the savings worth it. That is the pattern your answers are moving toward.",
+      BORDERLINE: "Your inputs split the decision. Some signals support used for value, while others support new for certainty. This is the kind of car-buying decision where personal comfort with risk can reasonably break the tie."
+    }
+  });
 
-  const confidence = Math.abs(score) >= 9 ? "High" : Math.abs(score) >= 5 ? "Medium" : "Low";
+  result.note = note;
+  result.budgetPressure = getBudgetPressure(v, result.verdict);
+  result.certaintyNeed = getCertaintyNeed(v, result.verdict);
+  result.practicalLean = getPracticalLean(result.verdict);
 
-  const summary = verdict === "NEW"
-    ? "Buying new looks stronger because warranty certainty, long-term use, or low tolerance for used-car risk are doing more work than the upfront savings of used."
-    : verdict === "USED"
-      ? "Buying used looks stronger because upfront value and your comfort with used-car risk matter more than paying a premium for certainty."
-      : "This is a close call: the case for used-car value is real, but so is the appeal of warranty certainty and a cleaner starting point.";
+  if (includeExamples) {
+    const scenarios = [
+      {
+        title: "Shorter ownership, tighter budget",
+        input: { ...v, years: Math.min(v.years, 3), budget: "high", risk: "medium" }
+      },
+      {
+        title: "Long ownership, low surprise tolerance",
+        input: { ...v, years: Math.max(v.years, 7), warranty: "high", risk: "low" }
+      },
+      {
+        title: "Used car with trusted inspection path",
+        input: { ...v, inspection: "yes", budget: "medium", risk: "high" }
+      }
+    ];
 
-  const explanation = verdict === "NEW"
-    ? "The strongest new-car cases usually combine longer ownership, heavier use, stronger warranty needs, or low tolerance for surprise issues. Those are the signals doing the most work in your answers."
-    : verdict === "USED"
-      ? "The strongest used-car cases usually combine stronger price pressure, shorter ownership, and enough comfort with inspection and maintenance risk to make the savings worth it. That is the pattern your answers are moving toward."
-      : "Your inputs split the decision. Some signals support used for value, while others support new for certainty. This is the kind of car-buying decision where personal comfort with risk can reasonably break the tie.";
+    result.examples = scenarios.map((scenario) => {
+      const scenarioResult = evaluateScenario(scenario.input, { includeExamples: false });
+      return {
+        title: scenario.title,
+        meta: [
+          `${scenario.input.years} years`,
+          `${scenario.input.mileage.toLocaleString()} miles/year`,
+          scenario.input.inspection === "yes" ? "Inspection available" : "No inspection backup"
+        ],
+        verdict: scenarioResult.verdict,
+        description: scenarioResult.summary
+      };
+    });
+  } else {
+    result.examples = [];
+  }
 
-  return {
-    verdict,
-    confidence,
-    reasons: reasons.slice(0, 4),
-    summary,
-    explanation,
-    note
-  };
+  return result;
+}
+
+function decide(v) {
+  return evaluateScenario(v, { includeExamples: true });
 }
 
 function render(result) {
@@ -188,13 +266,18 @@ function render(result) {
         ? "verdict-replace"
         : "verdict-borderline"
   );
-  confidenceEl.textContent = `${result.confidence} confidence`;
+  confidenceEl.textContent = result.confidenceText;
   confidenceEl.className = "confidence-pill";
   summaryEl.textContent = result.summary;
   reasonsEl.innerHTML = result.reasons.map((reason) => `<li>${reason}</li>`).join("");
+  realLifeEl.innerHTML = result.realLife.map((item) => `<li>${item}</li>`).join("");
   explainerEl.innerHTML = `<p>${result.explanation}</p>`;
   noteEl.hidden = !result.note;
   noteEl.innerHTML = result.note ? `<strong>${result.note}</strong>` : "";
+  budgetPressureEl.textContent = result.budgetPressure;
+  certaintyNeedEl.textContent = result.certaintyNeed;
+  practicalLeanEl.textContent = result.practicalLean;
+  renderExampleScenarios(generatedExamplesEl, result.examples);
 
   revealResultCard(card, confidenceEl, timers);
 }
@@ -229,7 +312,7 @@ form.addEventListener("submit", (event) => {
       setLoading(button, false);
       trackEvent(TOOL_NAME, "tool_result", {
         verdict: result.verdict,
-        confidence: result.confidence
+        confidence: result.confidenceScore
       });
     }
   });
