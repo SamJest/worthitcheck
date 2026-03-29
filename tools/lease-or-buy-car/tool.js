@@ -18,6 +18,15 @@ const mileageFitEl = document.querySelector("#lease-buy-mileage-fit");
 const practicalLeanEl = document.querySelector("#lease-buy-practical-lean");
 const realLifeEl = document.querySelector("#lease-buy-real-life");
 const generatedExamplesEl = document.querySelector("#lease-buy-generated-examples");
+const signalBreakdownEl = document.querySelector("#lease-buy-signal-breakdown");
+const actionPlanEl = document.querySelector("#lease-buy-action-plan");
+const decisionEdgesEl = document.querySelector("#lease-buy-decision-edges");
+const snapshotEl = document.querySelector("#lease-buy-snapshot");
+const copyLinkButton = document.querySelector("#lease-buy-copy-link");
+const copySummaryButton = document.querySelector("#lease-buy-copy-summary");
+
+let latestValues = null;
+let latestResult = null;
 const examplesToggle = document.querySelector("#examples-toggle");
 const extraExamples = Array.from(document.querySelectorAll(".extra-example"));
 
@@ -30,14 +39,25 @@ const steps = [
 ];
 
 const {
+  applyFormValues,
+  bindCopyStateLinkButton,
+  createShareUrl,
+  bindCopySummaryButton,
+  bindExampleReplay,
   clearTimers,
   initializeExamplesToggle,
+  readShareState,
+  renderDecisionSnapshot,
   renderExampleScenarios,
+  renderActionPlan,
+  renderDecisionEdges,
+  renderSignalBreakdown,
   revealResultCard,
   runAnalysis,
   runDecisionEngine,
   setLoading,
-  trackEvent
+  trackEvent,
+  writeShareState
 } = window.WorthItCheckTooling;
 
 function values() {
@@ -76,6 +96,158 @@ function getPracticalLean(verdict) {
   if (verdict === "LEASE") return "Flexibility and lower payment";
   if (verdict === "BUY") return "Ownership and long-term value";
   return "Lifestyle tie-breaker";
+}
+
+
+function buildActionPlan(v, result) {
+  if (result.verdict === "LEASE") {
+    return [
+      {
+        title: "Do this next",
+        tone: "primary",
+        items: [
+          "Compare real lease totals, not just the headline monthly payment.",
+          "Check mileage caps and end-of-term fees before you commit.",
+          "Prioritise offers that fit your shorter timeline or need for flexibility."
+        ]
+      },
+      {
+        title: "Recheck if this changes",
+        tone: "watch",
+        items: [
+          "You expect to keep the car much longer than planned.",
+          "Annual mileage rises enough to make lease limits uncomfortable.",
+          "Owning starts to matter more than switching cars easily."
+        ]
+      }
+    ];
+  }
+
+  if (result.verdict === "BUY") {
+    return [
+      {
+        title: "Do this next",
+        tone: "primary",
+        items: [
+          "Run the full 4-to-6 year ownership cost before choosing finance.",
+          "Compare finance rate, depreciation, and insurance together instead of separately.",
+          "Choose a car you would still be happy to keep if your plans stay stable."
+        ]
+      },
+      {
+        title: "Recheck if this changes",
+        tone: "watch",
+        items: [
+          "Your timeline shortens or life changes make flexibility more valuable.",
+          "Mileage falls enough that lease restrictions stop mattering.",
+          "A lease offer becomes unusually strong once all fees are included."
+        ]
+      }
+    ];
+  }
+
+  return [
+    {
+      title: "Do this next",
+      tone: "primary",
+      items: [
+        "Price one good lease and one good buy option over the same timeline.",
+        "Use expected mileage and how long you keep cars as the tie-breaker, not just monthly payment.",
+        "Avoid deciding until you compare the end-of-term cost, not just the start."
+      ]
+    },
+    {
+      title: "Recheck if this changes",
+      tone: "watch",
+      items: [
+        "Your expected mileage moves sharply up or down.",
+        "Your timeline becomes clearly short-term or clearly long-term.",
+        "You become much more price-sensitive or much more ownership-focused."
+      ]
+    }
+  ];
+}
+
+
+function buildDecisionEdges(v, result) {
+  if (result.verdict === "LEASE") {
+    return [
+      {
+        title: "What keeps this as a lease call",
+        label: "Current verdict stays strong",
+        tone: "keep",
+        intro: "Leasing stays stronger when you value lower commitment and a newer-car cycle more than ownership.",
+        items: [
+          v.years <= 3 ? "Your timeline stays relatively short." : "You still do not plan to keep the car for a very long stretch.",
+          v.mileage < 15000 ? "Annual mileage stays comfortably manageable for lease limits." : "Mileage does not rise enough to punish a lease badly.",
+          "Ownership flexibility and avoiding long-run repair risk stay important to you."
+        ]
+      },
+      {
+        title: "What could flip it toward buying",
+        label: "Alternative outcome",
+        tone: "flip",
+        intro: "A lease verdict weakens when you start acting more like a long-term owner.",
+        items: [
+          "You expect to keep the car longer than planned.",
+          "Mileage rises enough that lease restrictions start to bite.",
+          "Ownership starts to matter more than having a newer car every few years."
+        ]
+      }
+    ];
+  }
+
+  if (result.verdict === "BUY") {
+    return [
+      {
+        title: "What keeps this as a buy call",
+        label: "Current verdict stays strong",
+        tone: "keep",
+        intro: "Buying stays stronger when you behave like a long-term owner rather than a short-cycle user.",
+        items: [
+          `You still expect to keep the car for roughly ${v.years} years or longer.`,
+          v.mileage >= 15000 ? "Mileage stays high enough that lease limits would keep costing you." : "Mileage flexibility still matters more than a fresh lease cycle.",
+          "Building ownership value matters more than having the newest car regularly."
+        ]
+      },
+      {
+        title: "What could flip it toward leasing",
+        label: "Alternative outcome",
+        tone: "flip",
+        intro: "A buy verdict softens when shorter-term convenience becomes the priority.",
+        items: [
+          "Your timeline shortens and long-term ownership no longer fits.",
+          "A lower monthly payment becomes more important than ownership equity.",
+          "You want a newer car cycle and care less about restrictions or resale."
+        ]
+      }
+    ];
+  }
+
+  return [
+    {
+      title: "What would settle the call toward leasing",
+      label: "Short-cycle path",
+      tone: "watch",
+      intro: "Close calls lean toward leasing when you want predictable short-term driving and low commitment.",
+      items: [
+        "Your timeline stays short.",
+        "Mileage remains moderate enough for lease limits.",
+        "You care more about a newer car and simpler monthly planning than ownership."
+      ]
+    },
+    {
+      title: "What would settle the call toward buying",
+      label: "Long-run path",
+      tone: "flip",
+      intro: "Close calls lean toward buying when the car becomes a long-run asset instead of a short-cycle choice.",
+      items: [
+        "You plan to keep it longer than first expected.",
+        "Mileage or usage would make lease restrictions frustrating.",
+        "Ownership value becomes more important than a shorter commitment."
+      ]
+    }
+  ];
 }
 
 function evaluateScenario(v, options) {
@@ -220,9 +392,41 @@ function evaluateScenario(v, options) {
   });
 
   result.note = note;
+  result.signalBreakdown = [
+    {
+      label: "Ownership timeline",
+      detail: `${v.years} year plan`,
+      leanText: v.years <= 3 ? "Shorter timeline pushes toward leasing" : v.years >= 6 ? "Longer timeline pushes toward buying" : "Timeline is not one-sided",
+      tone: result.verdict === "BORDERLINE" ? "mixed" : (v.years <= 3 ? (result.verdict === "LEASE" ? "toward" : "away") : v.years >= 6 ? (result.verdict === "BUY" ? "toward" : "away") : "mixed"),
+      strength: v.years <= 3 ? 88 : v.years >= 6 ? 84 : 52
+    },
+    {
+      label: "Annual mileage",
+      detail: `${v.mileage.toLocaleString()} miles per year`,
+      leanText: v.mileage <= 12000 ? "Mileage fits leasing better" : v.mileage >= 15000 ? "Mileage pushes toward buying" : "Mileage could work either way",
+      tone: result.verdict === "BORDERLINE" ? "mixed" : (v.mileage <= 12000 ? (result.verdict === "LEASE" ? "toward" : "away") : v.mileage >= 15000 ? (result.verdict === "BUY" ? "toward" : "away") : "mixed"),
+      strength: v.mileage <= 12000 ? 78 : v.mileage >= 15000 ? 86 : 54
+    },
+    {
+      label: "Monthly payment pressure",
+      detail: v.payment === "high" ? "Lower monthly cost matters a lot" : v.payment === "medium" ? "Some payment pressure" : "Payment size is less important",
+      leanText: v.payment === "high" ? "Supports leasing" : v.payment === "low" ? "Makes buying easier to defend" : "Adds only light lease pressure",
+      tone: result.verdict === "BORDERLINE" ? "mixed" : (v.payment === "low" ? (result.verdict === "BUY" ? "toward" : "away") : (result.verdict === "LEASE" ? "toward" : "away")),
+      strength: v.payment === "high" ? 82 : v.payment === "medium" ? 60 : 34
+    },
+    {
+      label: "Ownership versus flexibility",
+      detail: `${v.ownership} ownership pull, ${v.newCar} new-car preference, ${v.change === "yes" ? "changing needs likely" : "needs look stable"}`,
+      leanText: (v.ownership === "high" || v.restrictions === "low") ? "Pushes toward buying" : "Flexibility still has real value",
+      tone: result.verdict === "BORDERLINE" ? "mixed" : ((v.ownership === "high" || v.restrictions === "low") ? (result.verdict === "BUY" ? "toward" : "away") : (result.verdict === "LEASE" ? "toward" : "away")),
+      strength: (v.ownership === "high" || v.restrictions === "low") ? 82 : 66
+    }
+  ];
   result.timelineFit = getTimelineFit(v, result.verdict);
   result.mileageFit = getMileageFit(v, result.verdict);
   result.practicalLean = getPracticalLean(result.verdict);
+  result.actionPlan = buildActionPlan(v, result);
+  result.decisionEdges = buildDecisionEdges(v, result);
 
   if (includeExamples) {
     const scenarios = [
@@ -250,6 +454,7 @@ function evaluateScenario(v, options) {
           scenario.input.ownership === "high" ? "Ownership matters" : "Flexibility matters"
         ],
         verdict: scenarioResult.verdict,
+        input: scenario.input,
         description: scenarioResult.summary
       };
     });
@@ -264,7 +469,122 @@ function decide(v) {
   return evaluateScenario(v, { includeExamples: true });
 }
 
-function render(result) {
+
+function buildSharedState(v) {
+  return {
+    years: Number(v.years),
+    mileage: Number(v.mileage),
+    payment: String(v.payment || ""),
+    ownership: String(v.ownership || ""),
+    newCar: String(v.newCar || ""),
+    restrictions: String(v.restrictions || ""),
+    change: String(v.change || "")
+  };
+}
+
+function humanize(value) {
+  return String(value || "").replace(/-/g, " ");
+}
+
+function labelize(value) {
+  const text = humanize(value).trim();
+  return text ? text.charAt(0).toUpperCase() + text.slice(1) : "";
+}
+
+function buildSnapshot(v, result) {
+  return [
+    {
+      label: "Recommendation",
+      emphasis: `${result.verdict} · ${result.confidenceText}`,
+      body: result.summary,
+      tone: "highlight"
+    },
+    {
+      label: "Inputs used",
+      items: [
+        `Ownership timeline: ${v.years} years`,
+        `Annual mileage: ${v.mileage.toLocaleString()} miles`,
+        `Payment sensitivity: ${labelize(v.payment)}`,
+        `Ownership priority: ${labelize(v.ownership)}`,
+        `Model switching preference: ${labelize(v.change)}`
+      ]
+    },
+    {
+      label: "Biggest signals",
+      items: result.reasons.slice(0, 3)
+    }
+  ];
+}
+
+function buildCopySummary(v, result) {
+  const nextMove = result.actionPlan && result.actionPlan[0] && result.actionPlan[0].items
+    ? result.actionPlan[0].items.slice(0, 2)
+    : [];
+
+  return [
+    "WorthItCheck — Lease or Buy Car",
+    `Result: ${result.verdict} (${result.confidenceText})`,
+    `Summary: ${result.summary}`,
+    result.note ? `Note: ${result.note}` : "",
+    `Inputs: ${v.years}-year timeline, ${v.mileage.toLocaleString()} miles/year, payment sensitivity ${humanize(v.payment)}, ownership priority ${humanize(v.ownership)}, restrictions tolerance ${humanize(v.restrictions)}.`,
+    "Key reasons:",
+    ...result.reasons.slice(0, 3).map((item) => `- ${item}`),
+    "Next step:",
+    ...nextMove.map((item) => `- ${item}`)
+  ].filter(Boolean).join("\n");
+}
+
+function runScenario(v, source) {
+  clearTimers(timers);
+
+  const error = validate(v);
+  if (error) {
+    message.textContent = error;
+    return;
+  }
+
+  const isReplay = source && source.kind === "replay";
+  const isSharedLink = source && source.kind === "shared-link";
+  message.textContent = isSharedLink ? "Loaded a shared setup." : "";
+  setLoading(button, true, {
+    loadingText: isReplay ? "Testing scenario..." : isSharedLink ? "Loading shared result..." : "Analyzing..."
+  });
+
+  if (isReplay) {
+    trackEvent(TOOL_NAME, "tool_scenario_replay", {
+      scenario_index: source.index,
+      scenario_title: source.title
+    });
+  } else if (isSharedLink) {
+    trackEvent(TOOL_NAME, "tool_shared_result_loaded");
+  } else {
+    trackEvent(TOOL_NAME, "tool_submit");
+  }
+
+  runAnalysis({
+    timers,
+    results,
+    thinking,
+    thinkingText,
+    card,
+    steps,
+    totalDuration: 1600,
+    onComplete() {
+      const result = decide(v);
+      render(result, v);
+      setLoading(button, false);
+      trackEvent(TOOL_NAME, "tool_result", {
+        verdict: result.verdict,
+        confidence: result.confidenceScore
+      });
+    }
+  });
+}
+
+function render(result, v) {
+  latestValues = v;
+  latestResult = result;
+  writeShareState(buildSharedState(v));
   verdictEl.textContent = result.verdict;
   verdictEl.className = "verdict";
   verdictEl.classList.add(
@@ -285,45 +605,56 @@ function render(result) {
   timelineFitEl.textContent = result.timelineFit;
   mileageFitEl.textContent = result.mileageFit;
   practicalLeanEl.textContent = result.practicalLean;
-  renderExampleScenarios(generatedExamplesEl, result.examples);
+  renderSignalBreakdown(signalBreakdownEl, result.signalBreakdown);
+  renderActionPlan(actionPlanEl, result.actionPlan);
+  renderDecisionEdges(decisionEdgesEl, result.decisionEdges);
+  renderDecisionSnapshot(snapshotEl, buildSnapshot(v, result));
+  renderExampleScenarios(generatedExamplesEl, result.examples, {
+    buttonText: "Try this setup"
+  });
+  bindExampleReplay(generatedExamplesEl, result.examples, (scenario, index) => {
+    if (!scenario || !scenario.input) return;
+    applyFormValues(form, scenario.input);
+    runScenario(scenario.input, {
+      kind: "replay",
+      index,
+      title: scenario.title || `Scenario ${index + 1}`
+    });
+  });
 
   revealResultCard(card, confidenceEl, timers);
 }
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
-  clearTimers(timers);
+  runScenario(values());
+});
 
-  const v = values();
-  const error = validate(v);
-
-  if (error) {
-    message.textContent = error;
-    return;
+bindCopySummaryButton(copySummaryButton, () => {
+  if (!latestValues || !latestResult) return "";
+  return buildCopySummary(latestValues, latestResult);
+}, {
+  onStatusChange(status) {
+    trackEvent(TOOL_NAME, "tool_copy_summary", { status });
   }
+});
 
-  message.textContent = "";
-  setLoading(button, true);
-  trackEvent(TOOL_NAME, "tool_submit");
-
-  runAnalysis({
-    timers,
-    results,
-    thinking,
-    thinkingText,
-    card,
-    steps,
-    totalDuration: 1600,
-    onComplete() {
-      const result = decide(v);
-      render(result);
-      setLoading(button, false);
-      trackEvent(TOOL_NAME, "tool_result", {
-        verdict: result.verdict,
-        confidence: result.confidenceScore
-      });
-    }
-  });
+bindCopyStateLinkButton(copyLinkButton, () => {
+  if (!latestValues) return "";
+  return createShareUrl(buildSharedState(latestValues));
+}, {
+  onStatusChange(status) {
+    trackEvent(TOOL_NAME, "tool_copy_exact_link", { status });
+  }
 });
 
 initializeExamplesToggle(examplesToggle, extraExamples);
+
+const sharedState = readShareState();
+if (sharedState) {
+  const nextValues = buildSharedState(sharedState);
+  applyFormValues(form, nextValues);
+  if (!validate(nextValues)) {
+    runScenario(nextValues, { kind: "shared-link" });
+  }
+}

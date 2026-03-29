@@ -104,10 +104,37 @@ const fullReasoning = document.querySelector("#full-reasoning");
 const examplesToggle = document.querySelector("#examples-toggle");
 const extraExamples = Array.from(document.querySelectorAll(".extra-example"));
 
+const EURO_REGIONS = new Set(["AT", "BE", "CY", "DE", "EE", "ES", "FI", "FR", "GR", "HR", "IT", "LT", "LU", "LV", "MT", "NL", "PT", "SI", "SK"]);
+
+function getCurrencyConfig() {
+  const locale = (navigator.languages && navigator.languages[0]) || navigator.language || "en-US";
+  const regionMatch = String(locale).match(/-([A-Za-z]{2})\b/);
+  const region = regionMatch ? regionMatch[1].toUpperCase() : "";
+
+  if (region === "GB") return { locale: "en-GB", currency: "GBP", symbol: "£" };
+  if (region === "US") return { locale: "en-US", currency: "USD", symbol: "$" };
+  if (region === "CA") return { locale: "en-CA", currency: "CAD", symbol: "$" };
+  if (region === "AU") return { locale: "en-AU", currency: "AUD", symbol: "$" };
+  if (region === "NZ") return { locale: "en-NZ", currency: "NZD", symbol: "$" };
+  if (region === "IE") return { locale: "en-IE", currency: "EUR", symbol: "€" };
+  if (EURO_REGIONS.has(region)) return { locale: locale, currency: "EUR", symbol: "€" };
+
+  return { locale: "en-US", currency: "USD", symbol: "$" };
+}
+
+function applyCurrencySymbols(root = document) {
+  const config = getCurrencyConfig();
+  root.querySelectorAll("[data-currency-symbol]").forEach((element) => {
+    element.textContent = config.symbol;
+  });
+  return config;
+}
+
 function currency(value) {
-  return new Intl.NumberFormat("en-US", {
+  const config = getCurrencyConfig();
+  return new Intl.NumberFormat(config.locale, {
     style: "currency",
-    currency: "USD",
+    currency: config.currency,
     maximumFractionDigits: 0
   }).format(value);
 }
@@ -448,3 +475,4 @@ form.addEventListener("submit", (event) => {
 
 populateCategories();
 initializeExamplesToggle();
+applyCurrencySymbols();

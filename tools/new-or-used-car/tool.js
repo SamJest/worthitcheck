@@ -18,6 +18,15 @@ const certaintyNeedEl = document.querySelector("#new-used-certainty-need");
 const practicalLeanEl = document.querySelector("#new-used-practical-lean");
 const realLifeEl = document.querySelector("#new-used-real-life");
 const generatedExamplesEl = document.querySelector("#new-used-generated-examples");
+const signalBreakdownEl = document.querySelector("#new-used-signal-breakdown");
+const actionPlanEl = document.querySelector("#new-used-action-plan");
+const decisionEdgesEl = document.querySelector("#new-used-decision-edges");
+const snapshotEl = document.querySelector("#new-used-snapshot");
+const copyLinkButton = document.querySelector("#new-used-copy-link");
+const copySummaryButton = document.querySelector("#new-used-copy-summary");
+
+let latestValues = null;
+let latestResult = null;
 const examplesToggle = document.querySelector("#examples-toggle");
 const extraExamples = Array.from(document.querySelectorAll(".extra-example"));
 
@@ -30,14 +39,25 @@ const steps = [
 ];
 
 const {
+  applyFormValues,
+  bindCopyStateLinkButton,
+  createShareUrl,
+  bindCopySummaryButton,
+  bindExampleReplay,
   clearTimers,
   initializeExamplesToggle,
+  readShareState,
+  renderDecisionSnapshot,
   renderExampleScenarios,
+  renderActionPlan,
+  renderDecisionEdges,
+  renderSignalBreakdown,
   revealResultCard,
   runAnalysis,
   runDecisionEngine,
   setLoading,
-  trackEvent
+  trackEvent,
+  writeShareState
 } = window.WorthItCheckTooling;
 
 function values() {
@@ -76,6 +96,158 @@ function getPracticalLean(verdict) {
   if (verdict === "NEW") return "Warranty and predictability";
   if (verdict === "USED") return "Value and lower upfront spend";
   return "Comfort with risk decides";
+}
+
+
+function buildActionPlan(v, result) {
+  if (result.verdict === "NEW") {
+    return [
+      {
+        title: "Do this next",
+        tone: "primary",
+        items: [
+          "Compare total on-the-road price, warranty cover, and depreciation together.",
+          "Keep extras and finance add-ons under control so the new-car premium stays justified.",
+          "Shortlist models with strong reliability rather than paying only for badge or trim."
+        ]
+      },
+      {
+        title: "Recheck if this changes",
+        tone: "watch",
+        items: [
+          "Your budget tightens more than expected.",
+          "A lightly used option appears with most of the warranty still left.",
+          "You become more comfortable accepting some uncertainty to save money."
+        ]
+      }
+    ];
+  }
+
+  if (result.verdict === "USED") {
+    return [
+      {
+        title: "Do this next",
+        tone: "primary",
+        items: [
+          "Only shortlist cars with clean history and an independent inspection path.",
+          "Keep a repair buffer aside so the cheaper purchase price stays a real saving.",
+          "Compare several nearly identical used examples instead of falling for the first bargain."
+        ]
+      },
+      {
+        title: "Recheck if this changes",
+        tone: "watch",
+        items: [
+          "Warranty and certainty start mattering much more than price.",
+          "Used market pricing stops offering a meaningful discount versus new.",
+          "Your risk tolerance drops after seeing weak history or condition on real cars."
+        ]
+      }
+    ];
+  }
+
+  return [
+    {
+      title: "Do this next",
+      tone: "primary",
+      items: [
+        "Compare one nearly-new option, one older used option, and one true new-car quote side by side.",
+        "Decide whether budget pressure or peace of mind matters more before you shop longer.",
+        "Use warranty length, mileage, and expected repair buffer as the tie-breakers."
+      ]
+    },
+    {
+      title: "Recheck if this changes",
+      tone: "watch",
+      items: [
+        "Your budget range changes materially.",
+        "You find a used example with unusually strong history and warranty cover.",
+        "You realise you want long-term certainty more than upfront savings."
+      ]
+    }
+  ];
+}
+
+
+function buildDecisionEdges(v, result) {
+  if (result.verdict === "NEW") {
+    return [
+      {
+        title: "What keeps this as a new-car call",
+        label: "Current verdict stays strong",
+        tone: "keep",
+        intro: "New stays stronger when certainty and low hassle matter more than squeezing out maximum value.",
+        items: [
+          v.warranty === "high" ? "Warranty protection still matters a lot to you." : "Certainty and lower surprise risk stay important.",
+          "Your budget can comfortably absorb the premium for a newer car.",
+          "You still plan to keep the car long enough for the cleaner ownership experience to matter."
+        ]
+      },
+      {
+        title: "What could flip it toward used",
+        label: "Alternative outcome",
+        tone: "flip",
+        intro: "The case for new weakens when value-for-money becomes more important than certainty.",
+        items: [
+          "A well-inspected used option appears with the features you actually need.",
+          "Budget pressure increases and the premium for new starts to feel unnecessary.",
+          "You become more comfortable with some risk in exchange for better value."
+        ]
+      }
+    ];
+  }
+
+  if (result.verdict === "USED") {
+    return [
+      {
+        title: "What keeps this as a used-car call",
+        label: "Current verdict stays strong",
+        tone: "keep",
+        intro: "Used stays stronger when value and depreciation matter more than a perfect ownership experience.",
+        items: [
+          "Budget discipline remains one of the main priorities.",
+          v.inspection === "high" ? "You can inspect carefully enough to reduce the worst used-car risks." : "You are still comfortable screening for a good used example.",
+          "The extra cost of new still feels bigger than the extra peace of mind."
+        ]
+      },
+      {
+        title: "What could flip it toward new",
+        label: "Alternative outcome",
+        tone: "flip",
+        intro: "A used verdict can change when the cost of uncertainty starts outweighing the savings.",
+        items: [
+          "You struggle to find a clean used option you genuinely trust.",
+          "Warranty, reliability, or predictable ownership suddenly matters much more.",
+          "The used-vs-new price gap narrows enough that buying new feels reasonable."
+        ]
+      }
+    ];
+  }
+
+  return [
+    {
+      title: "What would settle the call toward used",
+      label: "Value path",
+      tone: "watch",
+      intro: "Close calls lean toward used when you can find a trustworthy car without paying for unnecessary certainty.",
+      items: [
+        "A well-documented used car passes inspection cleanly.",
+        "The savings versus new stay meaningfully large.",
+        "You remain comfortable trading some certainty for better value."
+      ]
+    },
+    {
+      title: "What would settle the call toward new",
+      label: "Certainty path",
+      tone: "flip",
+      intro: "Close calls lean toward new when hassle reduction becomes the priority.",
+      items: [
+        "You cannot find a used option that feels reliable enough.",
+        "Warranty and lower-risk ownership become more important than before.",
+        "The premium for new starts to look acceptable within your budget."
+      ]
+    }
+  ];
 }
 
 function evaluateScenario(v, options) {
@@ -212,9 +384,41 @@ function evaluateScenario(v, options) {
   });
 
   result.note = note;
+  result.signalBreakdown = [
+    {
+      label: "Upfront budget pressure",
+      detail: v.budget === "high" ? "Keeping upfront cost down matters a lot" : v.budget === "medium" ? "Some pressure to spend less up front" : "Budget leaves room for a newer car",
+      leanText: v.budget === "low" ? "Makes new easier to justify" : "Pushes toward used value",
+      tone: result.verdict === "BORDERLINE" ? "mixed" : (v.budget === "low" ? (result.verdict === "NEW" ? "toward" : "away") : (result.verdict === "USED" ? "toward" : "away")),
+      strength: v.budget === "high" ? 88 : v.budget === "medium" ? 64 : 34
+    },
+    {
+      label: "Warranty and certainty",
+      detail: v.warranty === "high" ? "You want strong warranty cover and peace of mind" : v.warranty === "medium" ? "Some certainty matters" : "Warranty certainty is not a big priority",
+      leanText: v.warranty === "high" ? "Pushes toward buying new" : v.warranty === "low" ? "Leaves more room for used" : "Adds some new-car pull",
+      tone: result.verdict === "BORDERLINE" ? "mixed" : (v.warranty === "low" ? (result.verdict === "USED" ? "toward" : "away") : (result.verdict === "NEW" ? "toward" : "away")),
+      strength: v.warranty === "high" ? 90 : v.warranty === "medium" ? 62 : 36
+    },
+    {
+      label: "Risk and inspection backup",
+      detail: `${v.risk} comfort with used-car risk${v.inspection === "yes" ? ", with an inspection path" : ", without inspection backup"}`,
+      leanText: (v.risk === "high" || v.inspection === "yes") ? "Makes used more defensible" : "Pushes toward new-car certainty",
+      tone: result.verdict === "BORDERLINE" ? "mixed" : ((v.risk === "high" || v.inspection === "yes") ? (result.verdict === "USED" ? "toward" : "away") : (result.verdict === "NEW" ? "toward" : "away")),
+      strength: (v.risk === "high" || v.inspection === "yes") ? 78 : 82
+    },
+    {
+      label: "Ownership horizon and mileage",
+      detail: `${v.years} year plan with ${v.mileage.toLocaleString()} miles per year`,
+      leanText: (v.years >= 6 || v.mileage >= 18000) ? "Longer, heavier use helps new make sense" : "Shorter or lighter use keeps used appealing",
+      tone: result.verdict === "BORDERLINE" ? "mixed" : ((v.years >= 6 || v.mileage >= 18000) ? (result.verdict === "NEW" ? "toward" : "away") : (result.verdict === "USED" ? "toward" : "away")),
+      strength: (v.years >= 6 || v.mileage >= 18000) ? 74 : 52
+    }
+  ];
   result.budgetPressure = getBudgetPressure(v, result.verdict);
   result.certaintyNeed = getCertaintyNeed(v, result.verdict);
   result.practicalLean = getPracticalLean(result.verdict);
+  result.actionPlan = buildActionPlan(v, result);
+  result.decisionEdges = buildDecisionEdges(v, result);
 
   if (includeExamples) {
     const scenarios = [
@@ -242,6 +446,7 @@ function evaluateScenario(v, options) {
           scenario.input.inspection === "yes" ? "Inspection available" : "No inspection backup"
         ],
         verdict: scenarioResult.verdict,
+        input: scenario.input,
         description: scenarioResult.summary
       };
     });
@@ -256,7 +461,122 @@ function decide(v) {
   return evaluateScenario(v, { includeExamples: true });
 }
 
-function render(result) {
+
+function buildSharedState(v) {
+  return {
+    years: Number(v.years),
+    mileage: Number(v.mileage),
+    budget: String(v.budget || ""),
+    warranty: String(v.warranty || ""),
+    features: String(v.features || ""),
+    risk: String(v.risk || ""),
+    inspection: String(v.inspection || "")
+  };
+}
+
+function humanize(value) {
+  return String(value || "").replace(/-/g, " ");
+}
+
+function labelize(value) {
+  const text = humanize(value).trim();
+  return text ? text.charAt(0).toUpperCase() + text.slice(1) : "";
+}
+
+function buildSnapshot(v, result) {
+  return [
+    {
+      label: "Recommendation",
+      emphasis: `${result.verdict} · ${result.confidenceText}`,
+      body: result.summary,
+      tone: "highlight"
+    },
+    {
+      label: "Inputs used",
+      items: [
+        `Ownership timeline: ${v.years} years`,
+        `Annual mileage: ${v.mileage.toLocaleString()} miles`,
+        `Budget flexibility: ${labelize(v.budget)}`,
+        `Warranty importance: ${labelize(v.warranty)}`,
+        `Risk tolerance: ${labelize(v.risk)}`
+      ]
+    },
+    {
+      label: "Biggest signals",
+      items: result.reasons.slice(0, 3)
+    }
+  ];
+}
+
+function buildCopySummary(v, result) {
+  const nextMove = result.actionPlan && result.actionPlan[0] && result.actionPlan[0].items
+    ? result.actionPlan[0].items.slice(0, 2)
+    : [];
+
+  return [
+    "WorthItCheck — New or Used Car",
+    `Result: ${result.verdict} (${result.confidenceText})`,
+    `Summary: ${result.summary}`,
+    result.note ? `Note: ${result.note}` : "",
+    `Inputs: ${v.years}-year timeline, ${v.mileage.toLocaleString()} miles/year, budget ${humanize(v.budget)}, warranty importance ${humanize(v.warranty)}, feature priority ${humanize(v.features)}, risk tolerance ${humanize(v.risk)}.`,
+    "Key reasons:",
+    ...result.reasons.slice(0, 3).map((item) => `- ${item}`),
+    "Next step:",
+    ...nextMove.map((item) => `- ${item}`)
+  ].filter(Boolean).join("\n");
+}
+
+function runScenario(v, source) {
+  clearTimers(timers);
+
+  const error = validate(v);
+  if (error) {
+    message.textContent = error;
+    return;
+  }
+
+  const isReplay = source && source.kind === "replay";
+  const isSharedLink = source && source.kind === "shared-link";
+  message.textContent = isSharedLink ? "Loaded a shared setup." : "";
+  setLoading(button, true, {
+    loadingText: isReplay ? "Testing scenario..." : isSharedLink ? "Loading shared result..." : "Analyzing..."
+  });
+
+  if (isReplay) {
+    trackEvent(TOOL_NAME, "tool_scenario_replay", {
+      scenario_index: source.index,
+      scenario_title: source.title
+    });
+  } else if (isSharedLink) {
+    trackEvent(TOOL_NAME, "tool_shared_result_loaded");
+  } else {
+    trackEvent(TOOL_NAME, "tool_submit");
+  }
+
+  runAnalysis({
+    timers,
+    results,
+    thinking,
+    thinkingText,
+    card,
+    steps,
+    totalDuration: 1600,
+    onComplete() {
+      const result = decide(v);
+      render(result, v);
+      setLoading(button, false);
+      trackEvent(TOOL_NAME, "tool_result", {
+        verdict: result.verdict,
+        confidence: result.confidenceScore
+      });
+    }
+  });
+}
+
+function render(result, v) {
+  latestValues = v;
+  latestResult = result;
+  writeShareState(buildSharedState(v));
   verdictEl.textContent = result.verdict;
   verdictEl.className = "verdict";
   verdictEl.classList.add(
@@ -277,45 +597,56 @@ function render(result) {
   budgetPressureEl.textContent = result.budgetPressure;
   certaintyNeedEl.textContent = result.certaintyNeed;
   practicalLeanEl.textContent = result.practicalLean;
-  renderExampleScenarios(generatedExamplesEl, result.examples);
+  renderSignalBreakdown(signalBreakdownEl, result.signalBreakdown);
+  renderActionPlan(actionPlanEl, result.actionPlan);
+  renderDecisionEdges(decisionEdgesEl, result.decisionEdges);
+  renderDecisionSnapshot(snapshotEl, buildSnapshot(v, result));
+  renderExampleScenarios(generatedExamplesEl, result.examples, {
+    buttonText: "Try this setup"
+  });
+  bindExampleReplay(generatedExamplesEl, result.examples, (scenario, index) => {
+    if (!scenario || !scenario.input) return;
+    applyFormValues(form, scenario.input);
+    runScenario(scenario.input, {
+      kind: "replay",
+      index,
+      title: scenario.title || `Scenario ${index + 1}`
+    });
+  });
 
   revealResultCard(card, confidenceEl, timers);
 }
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
-  clearTimers(timers);
+  runScenario(values());
+});
 
-  const v = values();
-  const error = validate(v);
-
-  if (error) {
-    message.textContent = error;
-    return;
+bindCopySummaryButton(copySummaryButton, () => {
+  if (!latestValues || !latestResult) return "";
+  return buildCopySummary(latestValues, latestResult);
+}, {
+  onStatusChange(status) {
+    trackEvent(TOOL_NAME, "tool_copy_summary", { status });
   }
+});
 
-  message.textContent = "";
-  setLoading(button, true);
-  trackEvent(TOOL_NAME, "tool_submit");
-
-  runAnalysis({
-    timers,
-    results,
-    thinking,
-    thinkingText,
-    card,
-    steps,
-    totalDuration: 1600,
-    onComplete() {
-      const result = decide(v);
-      render(result);
-      setLoading(button, false);
-      trackEvent(TOOL_NAME, "tool_result", {
-        verdict: result.verdict,
-        confidence: result.confidenceScore
-      });
-    }
-  });
+bindCopyStateLinkButton(copyLinkButton, () => {
+  if (!latestValues) return "";
+  return createShareUrl(buildSharedState(latestValues));
+}, {
+  onStatusChange(status) {
+    trackEvent(TOOL_NAME, "tool_copy_exact_link", { status });
+  }
 });
 
 initializeExamplesToggle(examplesToggle, extraExamples);
+
+const sharedState = readShareState();
+if (sharedState) {
+  const nextValues = buildSharedState(sharedState);
+  applyFormValues(form, nextValues);
+  if (!validate(nextValues)) {
+    runScenario(nextValues, { kind: "shared-link" });
+  }
+}

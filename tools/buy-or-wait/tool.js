@@ -18,6 +18,15 @@ const pressureLevelEl = document.querySelector("#bw-pressure-level");
 const practicalLeanEl = document.querySelector("#bw-practical-lean");
 const realLifeEl = document.querySelector("#bw-real-life");
 const generatedExamplesEl = document.querySelector("#bw-generated-examples");
+const signalBreakdownEl = document.querySelector("#bw-signal-breakdown");
+const actionPlanEl = document.querySelector("#bw-action-plan");
+const decisionEdgesEl = document.querySelector("#bw-decision-edges");
+const snapshotEl = document.querySelector("#bw-snapshot");
+const copyLinkButton = document.querySelector("#bw-copy-link");
+const copySummaryButton = document.querySelector("#bw-copy-summary");
+
+let latestValues = null;
+let latestResult = null;
 const examplesToggle = document.querySelector("#examples-toggle");
 const extraExamples = Array.from(document.querySelectorAll(".extra-example"));
 
@@ -30,14 +39,25 @@ const steps = [
 ];
 
 const {
+  applyFormValues,
+  bindCopyStateLinkButton,
+  createShareUrl,
+  bindCopySummaryButton,
+  bindExampleReplay,
   clearTimers,
   initializeExamplesToggle,
+  readShareState,
   revealResultCard,
+  renderDecisionSnapshot,
   renderExampleScenarios,
+  renderActionPlan,
+  renderDecisionEdges,
+  renderSignalBreakdown,
   runAnalysis,
   runDecisionEngine,
   setLoading,
-  trackEvent
+  trackEvent,
+  writeShareState
 } = window.WorthItCheckTooling;
 
 function values() {
@@ -85,6 +105,159 @@ function getPracticalLean(verdict) {
   if (verdict === "BUY") return "Immediate replacement";
   if (verdict === "WAIT") return "Timing advantage";
   return "Balanced call";
+}
+
+
+function buildActionPlan(v, result) {
+  if (result.verdict === "BUY") {
+    return [
+      {
+        title: "Do this next",
+        tone: "primary",
+        items: [
+          "Set a hard price ceiling and buy within the current shopping window.",
+          "Compare only the top two options instead of continuing an open-ended search.",
+          "Ignore vague promises of a future deal unless you already know the exact date and discount."
+        ]
+      },
+      {
+        title: "Recheck if this changes",
+        tone: "watch",
+        items: [
+          "A confirmed sale or new-model release lands very soon.",
+          "The current item keeps working acceptably after a small repair or reset.",
+          "Your urgency drops from now to something you can comfortably postpone."
+        ]
+      }
+    ];
+  }
+
+  if (result.verdict === "WAIT") {
+    const timingLine = v.event === "none" ? "Wait only if you can name the exact future trigger for buying." : `Wait for the ${v.event.replace('-', ' ')} window instead of browsing early.`;
+    return [
+      {
+        title: "Do this next",
+        tone: "primary",
+        items: [
+          timingLine,
+          "Set a target buy price or date now so waiting has a real finish line.",
+          "Keep the current item going with only low-cost fixes while you wait."
+        ]
+      },
+      {
+        title: "Recheck if this changes",
+        tone: "watch",
+        items: [
+          "Condition worsens from minor annoyance to major problem.",
+          "Your need moves from later to now.",
+          "The event you were waiting for passes without giving you a clear upside."
+        ]
+      }
+    ];
+  }
+
+  return [
+    {
+      title: "Do this next",
+      tone: "primary",
+      items: [
+        "Decide how much convenience is worth to you before you keep comparing prices.",
+        "Set a short deadline so the decision does not drag on unnecessarily.",
+        "Choose one trigger for buying now and one trigger for waiting longer."
+      ]
+    },
+    {
+      title: "Recheck if this changes",
+      tone: "watch",
+      items: [
+        "A real sale or release window becomes certain.",
+        "The current item gets worse or becomes urgent.",
+        "Your feature pull becomes stronger than pure value hunting."
+      ]
+    }
+  ];
+}
+
+
+function buildDecisionEdges(v, result) {
+  if (result.verdict === "BUY") {
+    return [
+      {
+        title: "What keeps this as a buy-now call",
+        label: "Current verdict stays strong",
+        tone: "keep",
+        intro: "Buying now stays stronger when waiting adds delay without real upside.",
+        items: [
+          v.urgency === "high" ? "The need is still urgent enough that waiting creates real friction." : "Delaying still has a practical cost for you.",
+          "There is no obvious sale or product drop that meaningfully improves the deal soon.",
+          "The current item keeps feeling old enough or weak enough that holding off is mostly a hassle."
+        ]
+      },
+      {
+        title: "What could flip it toward waiting",
+        label: "Alternative outcome",
+        tone: "flip",
+        intro: "A buy-now verdict softens if a short delay is likely to create a noticeably better outcome.",
+        items: [
+          "A credible sale window or release cycle is close enough to matter.",
+          "Your current item turns out to be usable for a bit longer than expected.",
+          "The new features you want are tied to the next model rather than the current one."
+        ]
+      }
+    ];
+  }
+
+  if (result.verdict === "WAIT") {
+    return [
+      {
+        title: "What keeps this as a wait call",
+        label: "Current verdict stays strong",
+        tone: "keep",
+        intro: "Waiting stays smart when the likely benefit of patience is larger than the short-term inconvenience.",
+        items: [
+          "Your current item is still usable enough for now.",
+          v.event !== "none" ? "There is still a real upcoming event that could improve price or choice." : "There is still a decent chance a better buying window appears soon.",
+          "The purchase is more discretionary than urgent."
+        ]
+      },
+      {
+        title: "What could flip it toward buying now",
+        label: "Alternative outcome",
+        tone: "flip",
+        intro: "A wait verdict usually changes when the current item stops being good enough to bridge the gap.",
+        items: [
+          "The current item becomes unreliable or fails outright.",
+          "The expected discount or new release benefit starts to look minor.",
+          "Urgency rises enough that the delay now costs more than the expected savings."
+        ]
+      }
+    ];
+  }
+
+  return [
+    {
+      title: "What would settle the call toward waiting",
+      label: "Patience path",
+      tone: "watch",
+      intro: "Close calls lean toward waiting when near-term timing improves the deal.",
+      items: [
+        "A sale, release, or seasonal drop is close and credible.",
+        "Your current item can comfortably bridge the gap.",
+        "The purchase is nice to have rather than urgent."
+      ]
+    },
+    {
+      title: "What would settle the call toward buying now",
+      label: "Immediate path",
+      tone: "flip",
+      intro: "Close calls lean toward buying now once the real-life cost of waiting becomes obvious.",
+      items: [
+        "The current item starts blocking daily life or work.",
+        "The likely future discount looks smaller than the inconvenience of waiting.",
+        "A strong current deal appears and removes the need to time the market."
+      ]
+    }
+  ];
 }
 
 function evaluateScenario(v, options) {
@@ -187,9 +360,41 @@ function evaluateScenario(v, options) {
   if (!note && verdict === "WAIT" && v.event === "seasonal") note = "Recommended: wait for the next seasonal sale window.";
 
   result.note = note;
+  result.signalBreakdown = [
+    {
+      label: "Urgency",
+      detail: v.urgency === "now" ? "You need a solution now" : v.urgency === "soon" ? "You can wait a little" : "You can comfortably hold off",
+      leanText: v.urgency === "now" ? "Pushes toward buying now" : "Supports waiting if the rest of the case is strong",
+      tone: result.verdict === "BORDERLINE" ? "mixed" : (v.urgency === "now" ? (result.verdict === "BUY" ? "toward" : "away") : (result.verdict === "WAIT" ? "toward" : "away")),
+      strength: v.urgency === "now" ? 94 : v.urgency === "soon" ? 60 : 34
+    },
+    {
+      label: "Current condition",
+      detail: v.condition === "major" ? "Major issues already affecting use" : v.condition === "minor" ? "Minor issues only" : "Still working fine",
+      leanText: v.condition === "major" ? "Pushes toward buying now" : v.condition === "working" ? "Supports waiting" : "Adds some buy-now pressure",
+      tone: result.verdict === "BORDERLINE" ? "mixed" : (v.condition === "working" ? (result.verdict === "WAIT" ? "toward" : "away") : (result.verdict === "BUY" ? "toward" : "away")),
+      strength: v.condition === "major" ? 90 : v.condition === "minor" ? 58 : 28
+    },
+    {
+      label: "Timing window",
+      detail: v.event === "none" ? "No clear sale or release window" : v.event === "black-friday" ? "Black Friday or a major sale is close" : v.event === "release" ? "A new model release is near" : "A seasonal sale is close",
+      leanText: v.event === "none" ? "Does not add much waiting upside" : "Gives waiting a concrete upside",
+      tone: result.verdict === "BORDERLINE" ? "mixed" : (v.event === "none" ? (result.verdict === "BUY" ? "toward" : "away") : (result.verdict === "WAIT" ? "toward" : "away")),
+      strength: v.event === "none" ? 42 : 84
+    },
+    {
+      label: "Age and feature pull",
+      detail: `${v.age} years old with ${v.features} interest in new features`,
+      leanText: (v.age >= 5 || v.features === "high") ? "Adds buy-now pressure" : "Makes waiting easier to justify",
+      tone: result.verdict === "BORDERLINE" ? "mixed" : ((v.age >= 5 || v.features === "high") ? (result.verdict === "BUY" ? "toward" : "away") : (result.verdict === "WAIT" ? "toward" : "away")),
+      strength: (v.age >= 5 && v.features === "high") ? 74 : (v.age >= 5 || v.features === "high") ? 58 : 36
+    }
+  ];
   result.actionWindow = getActionWindow(v, verdict);
   result.pressureLevel = getPressureLevel(v, score);
   result.practicalLean = getPracticalLean(verdict);
+  result.actionPlan = buildActionPlan(v, result);
+  result.decisionEdges = buildDecisionEdges(v, result);
 
   if (includeExamples) {
     const scenarios = [
@@ -217,6 +422,7 @@ function evaluateScenario(v, options) {
           scenario.input.condition.replace("-", " ")
         ],
         verdict: scenarioResult.verdict,
+        input: scenario.input,
         description: scenarioResult.summary
       };
     });
@@ -231,7 +437,121 @@ function decide(v) {
   return evaluateScenario(v, { includeExamples: true });
 }
 
-function render(result) {
+
+function buildSharedState(v) {
+  return {
+    category: String(v.category || ""),
+    age: Number(v.age),
+    condition: String(v.condition || ""),
+    urgency: String(v.urgency || ""),
+    event: String(v.event || ""),
+    features: String(v.features || "")
+  };
+}
+
+function humanize(value) {
+  return String(value || "").replace(/-/g, " ");
+}
+
+function labelize(value) {
+  const text = humanize(value).trim();
+  return text ? text.charAt(0).toUpperCase() + text.slice(1) : "";
+}
+
+function buildSnapshot(v, result) {
+  return [
+    {
+      label: "Recommendation",
+      emphasis: `${result.verdict} · ${result.confidenceText}`,
+      body: result.summary,
+      tone: "highlight"
+    },
+    {
+      label: "Inputs used",
+      items: [
+        `Category: ${labelize(v.category)}`,
+        `Current item age: ${v.age} years`,
+        `Condition: ${labelize(v.condition)}`,
+        `Urgency: ${labelize(v.urgency)}`,
+        `Timing event: ${labelize(v.event)}`
+      ]
+    },
+    {
+      label: "Biggest signals",
+      items: result.reasons.slice(0, 3)
+    }
+  ];
+}
+
+function buildCopySummary(v, result) {
+  const nextMove = result.actionPlan && result.actionPlan[0] && result.actionPlan[0].items
+    ? result.actionPlan[0].items.slice(0, 2)
+    : [];
+
+  return [
+    "WorthItCheck — Buy or Wait",
+    `Result: ${result.verdict} (${result.confidenceText})`,
+    `Summary: ${result.summary}`,
+    result.note ? `Timing note: ${result.note}` : "",
+    `Inputs: ${labelize(v.category)}, ${v.age} years old, condition ${humanize(v.condition)}, urgency ${humanize(v.urgency)}, timing event ${humanize(v.event)}, feature pull ${humanize(v.features)}.`,
+    "Key reasons:",
+    ...result.reasons.slice(0, 3).map((item) => `- ${item}`),
+    "Next step:",
+    ...nextMove.map((item) => `- ${item}`)
+  ].filter(Boolean).join("\n");
+}
+
+function runScenario(v, source) {
+  clearTimers(timers);
+
+  const error = validate(v);
+  if (error) {
+    message.textContent = error;
+    return;
+  }
+
+  const isReplay = source && source.kind === "replay";
+  const isSharedLink = source && source.kind === "shared-link";
+  message.textContent = isSharedLink ? "Loaded a shared setup." : "";
+  setLoading(button, true, {
+    loadingText: isReplay ? "Testing scenario..." : isSharedLink ? "Loading shared result..." : "Analyzing..."
+  });
+
+  if (isReplay) {
+    trackEvent(TOOL_NAME, "tool_scenario_replay", {
+      scenario_index: source.index,
+      scenario_title: source.title
+    });
+  } else if (isSharedLink) {
+    trackEvent(TOOL_NAME, "tool_shared_result_loaded");
+  } else {
+    trackEvent(TOOL_NAME, "tool_submit");
+  }
+
+  runAnalysis({
+    timers,
+    results,
+    thinking,
+    thinkingText,
+    card,
+    steps,
+    totalDuration: 1500,
+    onComplete() {
+      const result = decide(v);
+      render(result, v);
+      setLoading(button, false);
+      trackEvent(TOOL_NAME, "tool_result", {
+        verdict: result.verdict,
+        confidence: result.confidenceScore
+      });
+    }
+  });
+}
+
+function render(result, v) {
+  latestValues = v;
+  latestResult = result;
+  writeShareState(buildSharedState(v));
   verdictEl.textContent = result.verdict;
   verdictEl.className = "verdict";
   verdictEl.classList.add(
@@ -252,45 +572,56 @@ function render(result) {
   actionWindowEl.textContent = result.actionWindow;
   pressureLevelEl.textContent = result.pressureLevel;
   practicalLeanEl.textContent = result.practicalLean;
-  renderExampleScenarios(generatedExamplesEl, result.examples);
+  renderSignalBreakdown(signalBreakdownEl, result.signalBreakdown);
+  renderActionPlan(actionPlanEl, result.actionPlan);
+  renderDecisionEdges(decisionEdgesEl, result.decisionEdges);
+  renderDecisionSnapshot(snapshotEl, buildSnapshot(v, result));
+  renderExampleScenarios(generatedExamplesEl, result.examples, {
+    buttonText: "Try this setup"
+  });
+  bindExampleReplay(generatedExamplesEl, result.examples, (scenario, index) => {
+    if (!scenario || !scenario.input) return;
+    applyFormValues(form, scenario.input);
+    runScenario(scenario.input, {
+      kind: "replay",
+      index,
+      title: scenario.title || `Scenario ${index + 1}`
+    });
+  });
 
   revealResultCard(card, confidenceEl, timers);
 }
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
-  clearTimers(timers);
+  runScenario(values());
+});
 
-  const v = values();
-  const error = validate(v);
-
-  if (error) {
-    message.textContent = error;
-    return;
+bindCopySummaryButton(copySummaryButton, () => {
+  if (!latestValues || !latestResult) return "";
+  return buildCopySummary(latestValues, latestResult);
+}, {
+  onStatusChange(status) {
+    trackEvent(TOOL_NAME, "tool_copy_summary", { status });
   }
+});
 
-  message.textContent = "";
-  setLoading(button, true);
-  trackEvent(TOOL_NAME, "tool_submit");
-
-  runAnalysis({
-    timers,
-    results,
-    thinking,
-    thinkingText,
-    card,
-    steps,
-    totalDuration: 1500,
-    onComplete() {
-      const result = decide(v);
-      render(result);
-      setLoading(button, false);
-      trackEvent(TOOL_NAME, "tool_result", {
-        verdict: result.verdict,
-        confidence: result.confidenceScore
-      });
-    }
-  });
+bindCopyStateLinkButton(copyLinkButton, () => {
+  if (!latestValues) return "";
+  return createShareUrl(buildSharedState(latestValues));
+}, {
+  onStatusChange(status) {
+    trackEvent(TOOL_NAME, "tool_copy_exact_link", { status });
+  }
 });
 
 initializeExamplesToggle(examplesToggle, extraExamples);
+
+const sharedState = readShareState();
+if (sharedState) {
+  const nextValues = buildSharedState(sharedState);
+  applyFormValues(form, nextValues);
+  if (!validate(nextValues)) {
+    runScenario(nextValues, { kind: "shared-link" });
+  }
+}
