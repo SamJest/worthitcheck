@@ -72,6 +72,21 @@ const TOOL_CONTENT = {
     medium: "Moderate importance",
     high: "High importance"
   },
+  repairTypeMap: {
+    simple: { label: "Simple / isolated repair", score: 9 },
+    moderate: { label: "Moderate repair", score: 0 },
+    major: { label: "Major core repair", score: -14 }
+  },
+  issueHistoryMap: {
+    first: { label: "First real issue", score: 5 },
+    second: { label: "Second issue / concern", score: -4 },
+    repeated: { label: "Repeated or stacking problems", score: -13 }
+  },
+  coverageMap: {
+    none: { label: "No coverage help", score: 0 },
+    partial: { label: "Partial contribution", score: 6 },
+    full: { label: "Mostly covered", score: 16 }
+  },
   thinkingSteps: [
     "Analyzing repair vs replacement cost...",
     "Checking typical lifespan...",
@@ -104,37 +119,10 @@ const fullReasoning = document.querySelector("#full-reasoning");
 const examplesToggle = document.querySelector("#examples-toggle");
 const extraExamples = Array.from(document.querySelectorAll(".extra-example"));
 
-const EURO_REGIONS = new Set(["AT", "BE", "CY", "DE", "EE", "ES", "FI", "FR", "GR", "HR", "IT", "LT", "LU", "LV", "MT", "NL", "PT", "SI", "SK"]);
-
-function getCurrencyConfig() {
-  const locale = (navigator.languages && navigator.languages[0]) || navigator.language || "en-US";
-  const regionMatch = String(locale).match(/-([A-Za-z]{2})\b/);
-  const region = regionMatch ? regionMatch[1].toUpperCase() : "";
-
-  if (region === "GB") return { locale: "en-GB", currency: "GBP", symbol: "£" };
-  if (region === "US") return { locale: "en-US", currency: "USD", symbol: "$" };
-  if (region === "CA") return { locale: "en-CA", currency: "CAD", symbol: "$" };
-  if (region === "AU") return { locale: "en-AU", currency: "AUD", symbol: "$" };
-  if (region === "NZ") return { locale: "en-NZ", currency: "NZD", symbol: "$" };
-  if (region === "IE") return { locale: "en-IE", currency: "EUR", symbol: "€" };
-  if (EURO_REGIONS.has(region)) return { locale: locale, currency: "EUR", symbol: "€" };
-
-  return { locale: "en-US", currency: "USD", symbol: "$" };
-}
-
-function applyCurrencySymbols(root = document) {
-  const config = getCurrencyConfig();
-  root.querySelectorAll("[data-currency-symbol]").forEach((element) => {
-    element.textContent = config.symbol;
-  });
-  return config;
-}
-
 function currency(value) {
-  const config = getCurrencyConfig();
-  return new Intl.NumberFormat(config.locale, {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: config.currency,
+    currency: "USD",
     maximumFractionDigits: 0
   }).format(value);
 }
@@ -170,6 +158,9 @@ function getImportanceData(importance) {
 function computeDecision(inputs) {
   const category = TOOL_CONTENT.categories[inputs.category];
   const condition = TOOL_CONTENT.conditionMap[inputs.condition];
+  const repairType = TOOL_CONTENT.repairTypeMap[inputs.repairType];
+  const issueHistory = TOOL_CONTENT.issueHistoryMap[inputs.issueHistory];
+  const coverage = TOOL_CONTENT.coverageMap[inputs.coverage];
   const costRatio = inputs.repairCost / inputs.replacementCost;
   const ageRatio = inputs.age / category.lifespan;
   const ageBand = getAgeBand(ageRatio);
@@ -189,10 +180,21 @@ function computeDecision(inputs) {
   score += ageBand.score;
   score += condition.score;
   score += importanceData.score;
+  score += repairType.score;
+  score += issueHistory.score;
+  score += coverage.score;
 
   reasons.push(`Your repair cost is ${percent(costRatio)} of replacement cost, which ${costRatio <= 0.35 ? "keeps repair financially comfortable" : costRatio <= 0.55 ? "puts the decision under pressure" : "makes repair a much harder sell"}.`);
   reasons.push(`At ${inputs.age} years old, this ${category.label.toLowerCase()} is ${ageBand.label} its typical ${category.lifespan}-year lifespan.`);
   reasons.push(`Its current condition is ${condition.label.toLowerCase()}, which ${condition.score >= 0 ? "supports getting more life out of it" : "raises the odds that this is not the last issue"}.`);
+  reasons.push(`${repairType.label} ${repairType.score >= 0 ? "still looks manageable if the rest of the item is sound" : "is the kind of repair that can quickly turn into a weak long-term spend"}.`);
+  reasons.push(`${issueHistory.label} ${issueHistory.score >= 0 ? "helps this look like an isolated fix" : "suggests the fault may not be isolated anymore"}.`);
+
+  if (coverage.score > 0) {
+    reasons.push(`${coverage.label} lowers the real pain of the repair bill, which meaningfully improves the repair case.`);
+  } else {
+    reasons.push("There is no outside coverage softening the repair bill, so the raw quote has to stand on its own merits.");
+  }
 
   if (importanceData.score > 0) {
     reasons.push(`${importanceData.label} adds real weight toward repair, especially if avoiding waste or keeping this specific item matters to you.`);
@@ -228,6 +230,21 @@ function computeDecision(inputs) {
   if (costRatio >= 0.85) {
     score -= 20;
     overrides.push("The repair is so close to replacement cost that replacement becomes the safer long-term move.");
+  }
+
+  if (["refrigerator", "dishwasher", "washer", "dryer", "television", "airConditioner"].includes(inputs.category) && inputs.repairType === "major") {
+    score -= 8;
+    overrides.push("Major component repairs on this type of item often bring more end-of-life pressure than a simple isolated fix.");
+  }
+
+  if (["phone", "laptop", "television"].includes(inputs.category) && inputs.issueHistory === "repeated") {
+    score -= 6;
+    overrides.push("Repeated electronic issues reduce confidence that one more repair will buy enough stable life.");
+  }
+
+  if (inputs.coverage === "full" && costRatio <= 0.65) {
+    score += 6;
+    overrides.push("Because most of the repair is covered, the financial case for one more repair cycle becomes easier to justify.");
   }
 
   reasons.push(...overrides);
@@ -277,6 +294,21 @@ function computeDecision(inputs) {
     emphasis: condition.score >= 0 ? "Stable signal" : "Risk signal"
   });
   factors.push({
+    title: "Repair context",
+    detail: repairType.label,
+    emphasis: repairType.score >= 0 ? "Contained job" : "High-risk job"
+  });
+  factors.push({
+    title: "Fault history",
+    detail: issueHistory.label,
+    emphasis: issueHistory.score >= 0 ? "Looks isolated" : "Reliability pressure"
+  });
+  factors.push({
+    title: "Coverage help",
+    detail: coverage.label,
+    emphasis: coverage.score >= 12 ? "Repair made easier" : coverage.score >= 6 ? "Partial support" : "Paying full quote"
+  });
+  factors.push({
     title: "Personal weighting",
     detail: `${inputs.importance}/10 importance`,
     emphasis: importanceData.score >= 12 ? "Strong repair pull" : importanceData.score >= 6 ? "Light repair pull" : "Mostly neutral"
@@ -303,6 +335,11 @@ function computeDecision(inputs) {
         label: "Condition outlook",
         value: condition.label,
         note: category.categoryNote
+      },
+      {
+        label: "Repair context",
+        value: repairType.label,
+        note: `${issueHistory.label} · ${coverage.label}`
       }
     ]
   };
@@ -315,6 +352,9 @@ function validateInputs(formData) {
   const replacementCost = Number(formData.get("replacementCost"));
   const condition = formData.get("condition");
   const importance = Number(formData.get("importance"));
+  const repairType = formData.get("repairType") || "simple";
+  const issueHistory = formData.get("issueHistory") || "first";
+  const coverage = formData.get("coverage") || "none";
 
   if (!category || !TOOL_CONTENT.categories[category]) return { error: "Choose an item category to get a realistic recommendation." };
   if (!Number.isFinite(age) || age < 0) return { error: "Enter a valid age in years." };
@@ -323,9 +363,12 @@ function validateInputs(formData) {
   if (repairCost > replacementCost * 4) return { error: "That repair cost looks unusually high. Check the numbers and try again." };
   if (!TOOL_CONTENT.conditionMap[condition]) return { error: "Choose the current condition so the decision can weigh risk properly." };
   if (!Number.isFinite(importance) || importance < 0 || importance > 10) return { error: "Set importance between 0 and 10." };
+  if (!TOOL_CONTENT.repairTypeMap[repairType]) return { error: "Choose the repair severity so the tool can judge how risky the fix really is." };
+  if (!TOOL_CONTENT.issueHistoryMap[issueHistory]) return { error: "Choose the fault history so the tool can weigh repeat-risk properly." };
+  if (!TOOL_CONTENT.coverageMap[coverage]) return { error: "Choose whether any warranty or coverage help changes the real repair cost." };
 
   return {
-    data: { category, age, repairCost, replacementCost, condition, importance }
+    data: { category, age, repairCost, replacementCost, condition, importance, repairType, issueHistory, coverage }
   };
 }
 
@@ -475,4 +518,3 @@ form.addEventListener("submit", (event) => {
 
 populateCategories();
 initializeExamplesToggle();
-applyCurrencySymbols();

@@ -23,6 +23,9 @@ const decisionEdgesEl = document.querySelector("#upgrade-decision-edges");
 const snapshotEl = document.querySelector("#upgrade-snapshot");
 const copyLinkButton = document.querySelector("#upgrade-copy-link");
 const copySummaryButton = document.querySelector("#upgrade-copy-summary");
+const comparisonEl = document.querySelector("#upgrade-comparison");
+const saveCompareButton = document.querySelector("#upgrade-save-compare");
+const clearCompareButton = document.querySelector("#upgrade-clear-compare");
 
 let latestValues = null;
 let latestResult = null;
@@ -491,6 +494,31 @@ function buildCopySummary(v, result) {
   ].join("\n");
 }
 
+function buildComparisonPayload(v, result) {
+  return {
+    verdict: result.verdict,
+    confidenceText: result.confidenceText,
+    confidenceScore: result.confidenceScore,
+    summary: result.summary,
+    snapshotSections: buildSnapshot(v, result),
+    keyReasons: Array.isArray(result.reasons) ? result.reasons.slice(0, 3) : [],
+    state: buildSharedState(v)
+  };
+}
+
+function refreshComparison(v, result) {
+  const currentPayload = buildComparisonPayload(v, result);
+  const savedPayload = readStoredComparison(TOOL_NAME);
+  renderComparisonPanel(comparisonEl, savedPayload, currentPayload, {
+    emptyText: 'The compare view helps you see whether waiting or upgrading actually changes the practical call once you adjust timing and pain points.'
+  });
+
+  if (clearCompareButton) {
+    clearCompareButton.disabled = !savedPayload;
+  }
+}
+
+
 function runScenario(v, source) {
   clearTimers(timers);
 
@@ -564,6 +592,7 @@ function render(result, v) {
   renderActionPlan(actionPlanEl, result.actionPlan);
   renderDecisionEdges(decisionEdgesEl, result.decisionEdges);
   renderDecisionSnapshot(snapshotEl, buildSnapshot(v, result));
+  refreshComparison(v, result);
   renderExampleScenarios(generatedExamplesEl, result.examples, {
     buttonText: "Try this setup"
   });
@@ -602,6 +631,42 @@ bindCopyStateLinkButton(copyLinkButton, () => {
     trackEvent(TOOL_NAME, "tool_copy_exact_link", { status });
   }
 });
+
+if (saveCompareButton) {
+  saveCompareButton.addEventListener("click", () => {
+    if (!latestValues || !latestResult) return;
+    const saved = saveStoredComparison(TOOL_NAME, buildComparisonPayload(latestValues, latestResult));
+    saveCompareButton.textContent = saved ? "Saved baseline" : "Save failed";
+    saveCompareButton.classList.toggle("is-success", Boolean(saved));
+    saveCompareButton.classList.toggle("is-error", !saved);
+    window.setTimeout(() => {
+      saveCompareButton.textContent = "Save current as baseline";
+      saveCompareButton.classList.remove("is-success", "is-error");
+    }, 1800);
+    if (saved) {
+      refreshComparison(latestValues, latestResult);
+    }
+    trackEvent(TOOL_NAME, "tool_compare_save", { status: saved ? "success" : "error" });
+  });
+}
+
+if (clearCompareButton) {
+  clearCompareButton.addEventListener("click", () => {
+    const cleared = clearStoredComparison(TOOL_NAME);
+    clearCompareButton.textContent = cleared ? "Cleared" : "Clear failed";
+    clearCompareButton.classList.toggle("is-success", Boolean(cleared));
+    clearCompareButton.classList.toggle("is-error", !cleared);
+    window.setTimeout(() => {
+      clearCompareButton.textContent = "Clear saved baseline";
+      clearCompareButton.classList.remove("is-success", "is-error");
+      clearCompareButton.disabled = false;
+    }, 1800);
+    if (cleared && latestValues && latestResult) {
+      refreshComparison(latestValues, latestResult);
+    }
+    trackEvent(TOOL_NAME, "tool_compare_clear", { status: cleared ? "success" : "error" });
+  });
+}
 
 initializeExamplesToggle(examplesToggle, extraExamples);
 

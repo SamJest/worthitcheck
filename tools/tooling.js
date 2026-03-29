@@ -567,6 +567,142 @@
   }
 
 
+  function compareStorageKey(toolName) {
+    return `worthitcheck_compare_${String(toolName || "tool").toLowerCase()}`;
+  }
+
+  function saveStoredComparison(toolName, payload) {
+    try {
+      window.localStorage.setItem(compareStorageKey(toolName), JSON.stringify(payload || {}));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function readStoredComparison(toolName) {
+    try {
+      const raw = window.localStorage.getItem(compareStorageKey(toolName));
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" ? parsed : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function clearStoredComparison(toolName) {
+    try {
+      window.localStorage.removeItem(compareStorageKey(toolName));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function renderComparisonSnapshotSections(sections) {
+    const items = Array.isArray(sections) ? sections.filter(Boolean).slice(0, 3) : [];
+    return items.map((section) => {
+      const tone = section.tone === "highlight" ? " snapshot-card--highlight" : "";
+      const label = escapeHtml(section.label || "Summary");
+      const emphasis = section.emphasis
+        ? `<p class="snapshot-emphasis">${escapeHtml(section.emphasis)}</p>`
+        : "";
+      const body = section.body
+        ? `<p class="snapshot-body">${escapeHtml(section.body)}</p>`
+        : "";
+      const bullets = normalizeBullets(section.items, 5);
+      const list = bullets.length
+        ? `<ul class="snapshot-list">${bullets.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`
+        : "";
+
+      return `
+        <article class="snapshot-card${tone}">
+          <span class="snapshot-label">${label}</span>
+          ${emphasis}
+          ${body}
+          ${list}
+        </article>
+      `;
+    }).join("");
+  }
+
+  function renderComparisonPanel(container, saved, current, options) {
+    if (!container) return;
+    const settings = {
+      emptyText: "Save the current result as a baseline, then change the inputs and run the tool again to compare both setups.",
+      ...options
+    };
+
+    if (!current) {
+      container.innerHTML = "";
+      return;
+    }
+
+    if (!saved) {
+      container.innerHTML = `<article class="comparison-placeholder"><p>${escapeHtml(settings.emptyText)}</p></article>`;
+      return;
+    }
+
+    const currentState = current.state && typeof current.state === "object" ? current.state : {};
+    const savedState = saved.state && typeof saved.state === "object" ? saved.state : {};
+    const sameScenario = JSON.stringify(currentState) === JSON.stringify(savedState);
+    const currentConfidence = Number(current.confidenceScore) || 0;
+    const savedConfidence = Number(saved.confidenceScore) || 0;
+    const confidenceDelta = currentConfidence - savedConfidence;
+
+    const notes = [];
+    if (sameScenario) {
+      notes.push("The saved baseline matches the current setup. Change the inputs and rerun the tool to see what actually flips.");
+    } else if (saved.verdict === current.verdict) {
+      notes.push(`The verdict stayed ${String(current.verdict || "the same").toUpperCase()}, so compare which assumptions made the recommendation stronger or weaker.`);
+    } else {
+      notes.push(`The verdict changed from ${String(saved.verdict || "baseline").toUpperCase()} to ${String(current.verdict || "current").toUpperCase()}.`);
+    }
+
+    if (!sameScenario) {
+      if (confidenceDelta >= 8) {
+        notes.push(`The current setup looks more decisive than the saved baseline by about ${Math.abs(confidenceDelta)} confidence points.`);
+      } else if (confidenceDelta <= -8) {
+        notes.push(`The current setup is less decisive than the saved baseline by about ${Math.abs(confidenceDelta)} confidence points.`);
+      } else {
+        notes.push("Confidence stayed fairly close, which usually means small assumption changes have not completely transformed the call.");
+      }
+    }
+
+    notes.push("Use the two snapshots below to see which totals, assumptions, and next steps changed the most.");
+
+    function renderCard(label, payload, toneClass) {
+      const reasons = normalizeBullets(payload.keyReasons, 3);
+      return `
+        <article class="comparison-card ${toneClass}">
+          <div class="comparison-card__topline">
+            <span class="comparison-card__label">${escapeHtml(label)}</span>
+            <span class="comparison-card__verdict">${escapeHtml(payload.verdict || "")}</span>
+          </div>
+          <p class="comparison-card__confidence">${escapeHtml(payload.confidenceText || "")}</p>
+          <p class="comparison-card__summary">${escapeHtml(payload.summary || "")}</p>
+          <div class="comparison-card__snapshots">
+            ${renderComparisonSnapshotSections(payload.snapshotSections)}
+          </div>
+          ${reasons.length ? `<ul class="comparison-card__reasons">${reasons.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : ""}
+        </article>
+      `;
+    }
+
+    container.innerHTML = `
+      <div class="comparison-grid">
+        ${renderCard("Saved baseline", saved, "comparison-card--saved")}
+        ${renderCard("Current scenario", current, "comparison-card--current")}
+      </div>
+      <article class="comparison-summary">
+        <strong>What changed</strong>
+        <ul>${notes.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+      </article>
+    `;
+  }
+
+
   window.WorthItCheckTooling = {
     createShareUrl,
     clearTimers,
@@ -584,6 +720,10 @@
     renderExampleScenarios,
     renderSignalBreakdown,
     runDecisionEngine,
+    saveStoredComparison,
+    readStoredComparison,
+    clearStoredComparison,
+    renderComparisonPanel,
     runAnalysis,
     writeShareState,
     setLoading,

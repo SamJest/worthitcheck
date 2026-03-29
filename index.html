@@ -120,13 +120,18 @@
           <p class="eyebrow">Repair or Replace</p>
           <h1>Repair or replace? Get a clear answer in seconds.</h1>
           <p class="hero-subheading">
-            WorthItCheck weighs repair cost, expected lifespan, condition, and long-term value to deliver a verdict that feels more like informed judgment than a basic calculator.
+            WorthItCheck now weighs repair cost, expected lifespan, condition, repair severity, repeat-fault risk, and long-term value to deliver a verdict that feels more like informed judgment than a basic calculator.
           </p>
           <div class="trust-strip" aria-label="Decision signals used">
             <span>Cost reality</span>
             <span>Lifespan context</span>
             <span>Condition signal</span>
-            <span>Value weighting</span>
+            <span>Repeat-fault risk</span>
+          </div>
+          <div class="page-status-bar" aria-label="WorthItCheck status">
+            <span class="status-pill status-pill--accent"><strong>Last updated</strong> 29 March 2026</span>
+            <span class="status-pill"><strong>Method focus</strong> Fast practical guidance, not regulated advice</span>
+            <span class="status-pill"><strong>Best next click</strong> Methodology and assumptions are linked below</span>
           </div>
         </div>
 
@@ -134,7 +139,7 @@
           <div class="tool-card__header">
             <p class="tool-chip">Primary tool</p>
             <h2 id="tool-title">Repair or Replace</h2>
-            <p>Enter a few details and get a confident recommendation with reasoning.</p>
+            <p>Enter the core numbers, then add advanced repair context if you want the verdict to account for repeat faults, repair severity, or warranty help.</p>
           </div>
 
           <form id="decision-form" class="decision-form" novalidate>
@@ -144,6 +149,7 @@
                 <select id="category" name="category" required>
                   <option value="">Choose a category</option>
                 </select>
+                <p class="field-helper">Repair guides are now available for phones, laptops, dishwashers, refrigerators, air conditioners, washing machines, dryers, and TVs.</p>
               </label>
 
               <label class="field">
@@ -190,6 +196,39 @@
                 </div>
               </fieldset>
             </div>
+
+              <details class="advanced-panel">
+                <summary>Advanced repair context</summary>
+                <p class="advanced-panel__intro">Use this when the decision depends on more than the raw quote. It helps WorthItCheck weigh whether the fault looks isolated, whether it keeps coming back, and whether warranty help changes the real out-of-pocket risk.</p>
+                <div class="field-grid field-grid--advanced">
+                  <label class="field">
+                    <span>Repair severity</span>
+                    <select id="repair-type" name="repairType">
+                      <option value="simple" selected>Simple / isolated repair</option>
+                      <option value="moderate">Moderate parts-and-labour repair</option>
+                      <option value="major">Major core repair</option>
+                    </select>
+                  </label>
+
+                  <label class="field">
+                    <span>Fault history</span>
+                    <select id="issue-history" name="issueHistory">
+                      <option value="first" selected>First real issue</option>
+                      <option value="second">Second issue / concern</option>
+                      <option value="repeated">Repeated or stacking problems</option>
+                    </select>
+                  </label>
+
+                  <label class="field">
+                    <span>Warranty or coverage help</span>
+                    <select id="coverage" name="coverage">
+                      <option value="none" selected>None</option>
+                      <option value="partial">Partial contribution</option>
+                      <option value="full">Mostly covered</option>
+                    </select>
+                  </label>
+                </div>
+              </details>
 
             <div id="form-message" class="form-message" role="status" aria-live="polite"></div>
 
@@ -805,7 +844,7 @@
         <div class="section-heading">
           <p class="eyebrow">Popular repair searches</p>
           <h2 id="repair-guides-overview-title">Repair or replace guides for the searches people make most</h2>
-          <p>Use these focused repair pages when you already know the item and want faster item-specific context before using the calculator.</p>
+          <p>Use these focused repair pages when you already know the item and want faster item-specific context before using the calculator. Batch 17 expands the repair cluster with washing-machine, dryer, and TV decision pages too.</p>
         </div>
         <div class="tool-listing-grid">
           <article class="tool-listing-card">
@@ -844,6 +883,84 @@
             <p>Check how AC age, repair size, and reliability trend affect the repair decision.</p>
             <a class="text-link" href="repair-or-replace/air-conditioner/">Open guide</a>
           </article>
+          <article class="tool-listing-card">
+            <p class="tool-chip">Guide</p>
+            <h3>Repair or Replace Washing Machine</h3>
+            <p>See when drum, pump, leak, or control-board problems still justify fixing a washer.</p>
+            <a class="text-link" href="repair-or-replace/washing-machine/">Open guide</a>
+          </article>
+          <article class="tool-listing-card">
+            <p class="tool-chip">Guide</p>
+            <h3>Repair or Replace Dryer</h3>
+            <p>Check when heat, sensor, and motor issues are still worth repairing on a dryer.</p>
+            <a class="text-link" href="repair-or-replace/dryer/">Open guide</a>
+          </article>
+          <article class="tool-listing-card">
+            <p class="tool-chip">Guide</p>
+            <h3>Repair or Replace TV</h3>
+            <p>Compare screen, board, and age pressure before paying to fix a television.</p>
+            <a class="text-link" href="repair-or-replace/tv/">Open guide</a>
+          </article>
+        </div>
+      </section>
+
+<section class="tools-overview section" aria-labelledby="trust-center-title">
+  <div class="section-heading">
+    <p class="eyebrow">Trust and transparency</p>
+    <h2 id="trust-center-title">Understand what the site does, what it does not do, and how to verify more.</h2>
+    <p>WorthItCheck is strongest when it helps you narrow a decision quickly, then points you toward the next thing worth checking before you spend money.</p>
+  </div>
+  <div class="tool-listing-grid">
+    <article class="tool-listing-card">
+      <p class="tool-chip">Method</p>
+      <h3>Read the methodology</h3>
+      <p>See the assumptions, scoring logic, and the situations where a better real-world number can change the answer.</p>
+      <a class="text-link" href="methodology/">Open methodology</a>
+    </article>
+    <article class="tool-listing-card">
+      <p class="tool-chip">Privacy</p>
+      <h3>See what the site collects</h3>
+      <p>Learn what WorthItCheck uses analytics for, what it does not ask you to submit, and how to stay cautious with public feedback.</p>
+      <a class="text-link" href="privacy/">Read privacy</a>
+    </article>
+    <article class="tool-listing-card">
+      <p class="tool-chip">Contact</p>
+      <h3>Report issues or suggest improvements</h3>
+      <p>Use the public feedback route when you find a bug, broken link, or a missing decision factor that should be added.</p>
+      <a class="text-link" href="contact/">Open contact options</a>
+    </article>
+
+    <article class="tool-listing-card">
+      <p class="tool-chip">Assumptions</p>
+      <h3>Read the scope notes</h3>
+      <p>See what each live tool currently includes, what it leaves out, and what to verify before you rely on a close verdict too heavily.</p>
+      <a class="text-link" href="assumptions/">Read assumptions</a>
+    </article>  </div>
+</section>
+
+            <section class="how-it-works section" aria-labelledby="commercial-trust-title">
+        <div class="section-heading">
+          <p class="eyebrow">Commercial trust</p>
+          <h2 id="commercial-trust-title">WorthItCheck is designed to stay useful even if the business model grows later.</h2>
+          <p>The site is easier to trust when the methodology, assumptions, monetisation rules, and public-use limits are visible instead of implied.</p>
+        </div>
+        <div class="authority-grid">
+          <article class="authority-card authority-card--accent">
+            <h3>No sponsored verdicts</h3>
+            <p>The reasoning layer is intended to follow the inputs and stated assumptions, not a paid placement or commercial preference.</p>
+          </article>
+          <article class="authority-card">
+            <h3>No forced sign-up</h3>
+            <p>The free public version is meant to stay useful without making you create an account just to see the basic answer.</p>
+          </article>
+          <article class="authority-card">
+            <h3>Clear rules and limits</h3>
+            <p>Privacy, terms, assumptions, and editorial standards are now linked directly so the site feels more complete and easier to verify.</p>
+          </article>
+        </div>
+        <div class="section-link-row">
+          <a class="text-link" href="editorial-standards/">Read editorial standards</a>
+          <a class="text-link" href="terms/">Read terms of use</a>
         </div>
       </section>
 
@@ -885,6 +1002,7 @@
       <div>
         <p class="brand-name">WorthItCheck</p>
         <p class="footer-copy">Clear repair-versus-replace decisions for real-world purchases and repairs.</p>
+        <p class="footer-muted footer-disclaimer">Free practical guidance. No sponsored verdicts. If ads or affiliate links are added later, they will stay separate from the scoring logic. For high-stakes decisions, verify the final numbers, rates, quotes, and contract terms yourself.</p>
       </div>
       <nav class="footer-nav" aria-label="Footer">
         <a href="tools/">All tools</a>
@@ -901,6 +1019,13 @@
       
         <a href="how-it-works/">How it works</a>
         <a href="about/">About</a>
+
+        <a href="methodology/">Methodology</a>
+        <a href="assumptions/">Assumptions</a>
+        <a href="privacy/">Privacy</a>
+        <a href="contact/">Contact</a>
+              <a href="editorial-standards/">Editorial standards</a>
+        <a href="terms/">Terms</a>
       </nav>
     </footer>
   </div>

@@ -120,6 +120,11 @@
             <span>Sale timing</span>
             <span>Upgrade pull</span>
           </div>
+          <div class="page-status-bar" aria-label="Tool status">
+            <span class="status-pill status-pill--accent"><strong>Last updated</strong> 29 March 2026</span>
+            <span class="status-pill"><strong>Method style</strong> Weighted signals with plain-English verdicts</span>
+            <span class="status-pill"><strong>Use carefully</strong> Check the assumptions before relying on close calls</span>
+          </div>
         </div>
 
         <section class="tool-card" aria-labelledby="buy-or-wait-title">
@@ -255,6 +260,18 @@
               <p class="decision-subcopy">Useful if you want to send this result to someone else, save the call for later, or reopen the exact setup.</p>
               <div id="bw-snapshot" class="decision-snapshot"></div>
             </div>
+
+            <div class="decision-subsection">
+              <div class="decision-subsection__topline">
+                <h3>Compare two scenarios side by side</h3>
+                <div class="decision-subsection__actions">
+                  <button id="bw-save-compare" class="summary-copy-button" type="button">Save current as baseline</button>
+                  <button id="bw-clear-compare" class="summary-copy-button summary-copy-button--secondary" type="button">Clear saved baseline</button>
+                </div>
+              </div>
+              <p class="decision-subcopy">Save one result, change the inputs, then run the tool again to compare both setups.</p>
+              <div id="bw-comparison" class="comparison-panel"></div>
+            </div>
             <details class="reasoning-details">
               <summary>See full reasoning</summary>
               <div id="bw-explainer" class="reasoning-copy"></div>
@@ -321,6 +338,37 @@
         <button id="examples-toggle" class="examples-toggle" type="button" aria-expanded="false" hidden>Show more examples</button>
       </section>
 
+      <section class="how-it-works section" aria-labelledby="buy-or-wait-scope-title">
+        <div class="section-heading">
+          <p class="eyebrow">Assumptions and limits</p>
+          <h2 id="buy-or-wait-scope-title">Buy or Wait scope notes</h2>
+          <p>This tool is designed for timing calls where urgency, product condition, and a nearby sale or model release all matter at once.</p>
+        </div>
+        <div class="scope-grid">
+          <article class="scope-card scope-card--accent">
+            <h3>What this tool includes</h3>
+            <ul class="scope-list">
+              <li>Urgency, condition, age, and upgrade pressure.</li><li>Nearby sale or launch windows as practical timing signals.</li><li>A fast verdict when the real question is timing rather than affordability.</li>
+            </ul>
+          </article>
+          <article class="scope-card">
+            <h3>What it leaves out</h3>
+            <ul class="scope-list">
+              <li>Live retailer prices, stock levels, and exact launch dates.</li><li>Contract terms, financing offers, and trade-in promotions.</li><li>Deeper affordability checks or long-term ownership cost.</li>
+            </ul>
+          </article>
+          <article class="scope-card">
+            <h3>Verify next on a close call</h3>
+            <p>Before acting on a close result, verify whether the sale or launch window is real enough to matter and whether your current item can comfortably last until then.</p>
+            <div class="section-link-row">
+              <a class="text-link" href="../../methodology/">Read methodology</a>
+              <a class="text-link" href="../../assumptions/">Read assumptions</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+
       <section class="faq section" aria-labelledby="bw-faq-title">
         <div class="section-heading">
           <p class="eyebrow">FAQ</p>
@@ -369,6 +417,7 @@
       <div>
         <p class="brand-name">WorthItCheck</p>
         <p class="footer-copy">Clear decision tools for real-world buying and repair calls.</p>
+        <p class="footer-muted footer-disclaimer">Free practical guidance. No sponsored verdicts. If ads or affiliate links are added later, they will stay separate from the scoring logic. For high-stakes decisions, verify the final numbers, rates, quotes, and contract terms yourself.</p>
       </div>
       <nav class="footer-nav" aria-label="Footer">
         <a href="../../">Home</a>
@@ -377,6 +426,15 @@
         <a href="../lease-or-buy-car/">Lease or Buy Car</a>
         <a href="../new-or-used-car/">New or Used Car</a>
         <a href="../trade-in-or-keep-your-phone/">Trade In or Keep Your Phone</a>
+
+        <a href="../../how-it-works/">How it works</a>
+        <a href="../../about/">About</a>
+        <a href="../../methodology/">Methodology</a>
+        <a href="../../assumptions/">Assumptions</a>
+        <a href="../../privacy/">Privacy</a>
+        <a href="../../contact/">Contact</a>
+              <a href="../../editorial-standards/">Editorial standards</a>
+        <a href="../../terms/">Terms</a>
       </nav>
     </footer>
   </div>
