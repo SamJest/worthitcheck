@@ -58,6 +58,21 @@ This document keeps long-tail SEO work as structured as tool work. The goal is t
   - `/trade-in-or-keep-your-phone/trade-in-now-or-wait/`
   - `/trade-in-or-keep-your-phone/keep-another-year/`
 
+
+### Lease or Buy Car
+- Hub: `/lease-or-buy-car/`
+- Scenario pages:
+  - `/lease-or-buy-car/3-years/`
+  - `/lease-or-buy-car/high-mileage/`
+  - `/lease-or-buy-car/low-monthly-payments/`
+
+### New or Used Car
+- Hub: `/new-or-used-car/`
+- Scenario pages:
+  - `/new-or-used-car/high-mileage-used-car/`
+  - `/new-or-used-car/short-ownership/`
+  - `/new-or-used-car/reliability/`
+
 ## Next cluster candidates
 
 - `Lease or Buy Car`
